@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #050505;
+  --surface: #0a0a0a;
+  --border: rgba(255,255,255,0.1);
+  --border-strong: rgba(255,255,255,0.2);
+  --text: #f2f2f2;
+  --dim: #71717a;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --red: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hide scrollbar */
+body::-webkit-scrollbar { display: none; }
+body { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Typography */
+.font-mono {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+}
+
+/* Status badges */
+.badge {
+  @apply inline-flex items-center px-2 py-1 text-[10px] font-mono uppercase tracking-widest border;
+}
+
+.badge-conforming {
+  @apply text-emerald-500 border-emerald-900 bg-emerald-950/20;
+}
+
+.badge-partial {
+  @apply text-yellow-500 border-yellow-900 bg-yellow-950/20;
+}
+
+.badge-non-conforming {
+  @apply text-red-500 border-red-900 bg-red-950/20;
+}
+
+.badge-layer {
+  @apply bg-zinc-800 text-zinc-300 border-transparent;
+}
+
+/* Tables */
+.data-table {
+  @apply w-full text-left border-collapse;
+}
+
+.data-table thead tr {
+  @apply border-b border-white/10 text-zinc-500 font-mono text-[10px] uppercase tracking-widest;
+}
+
+.data-table th {
+  @apply py-4 px-2 first:pl-4 last:pr-4;
+}
+
+.data-table tbody tr {
+  @apply border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer;
+}
+
+.data-table td {
+  @apply py-4 px-2 first:pl-4 last:pr-4;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply bg-white text-black px-8 py-4 font-mono text-xs uppercase tracking-widest font-bold;
+  @apply hover:bg-zinc-200 transition-colors;
+}
+
+.btn-secondary {
+  @apply border border-white/20 text-white px-8 py-4 font-mono text-xs uppercase tracking-widest;
+  @apply hover:border-emerald-500 hover:text-emerald-500 transition-colors;
+}
+
+/* Cards */
+.card {
+  @apply bg-[#0b0d10] border border-white/10 p-6;
+}
+
+/* Input */
+input[type="text"],
+input[type="search"],
+select {
+  @apply bg-[#0a0a0a] border border-white/20 text-white p-3 font-mono text-sm;
+  @apply focus:border-emerald-500 outline-none appearance-none rounded-none;
+}
+
+/* Section headers */
+.section-header {
+  @apply font-mono text-xs text-zinc-500 uppercase tracking-widest mb-6;
+}
+
+/* Score bars */
+.score-bar {
+  @apply h-2 w-full bg-zinc-900;
+}
+
+.score-fill {
+  @apply h-full transition-all duration-500;
+}
+
+/* Tab styles */
+.tab-item {
+  @apply px-3 py-1 border transition-colors font-mono text-[10px] uppercase tracking-widest;
+}
+
+.tab-item.active {
+  @apply bg-white text-black border-white;
+}
+
+.tab-item:not(.active) {
+  @apply text-zinc-500 border-transparent hover:border-zinc-800;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Noise overlay */
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
