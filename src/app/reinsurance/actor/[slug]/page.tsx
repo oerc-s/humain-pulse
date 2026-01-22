@@ -160,6 +160,7 @@ export default async function ActorPage({ params }: Props) {
                     style={{ width: `${scores.mli}%` }}
                   />
                 </div>
+                <div className="text-[9px] text-zinc-600 mt-2">Settlement readiness, not intent.</div>
               </div>
               <div className="bg-[#0b0d10] border border-white/10 p-6">
                 <div className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-2">MEI</div>

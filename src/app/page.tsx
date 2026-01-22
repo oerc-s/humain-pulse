@@ -7,10 +7,10 @@ export default function HomePage() {
 
   // Activity feed
   const feed = [
-    { type: 'NOTICE', text: `${stats.nonConforming} actors issued Non-Conformance notices`, time: 'Today' },
-    { type: 'DEBT', text: `${stats.totalDebtToday} total debt units accruing daily`, time: 'Active' },
+    { type: 'NOTICE', text: `${stats.nonConforming} actors unsettled — exposure accruing`, time: 'Today' },
+    { type: 'DEBT', text: `${stats.totalDebtToday} total exposure units accruing daily`, time: 'Active' },
     { type: 'SCORE', text: `Average MEI across registry: ${stats.avgMEI}/200`, time: 'Current' },
-    { type: 'STATUS', text: `${stats.partial} actors partially conforming`, time: 'Active' },
+    { type: 'STATUS', text: `${stats.partial} actors partially settled`, time: 'Active' },
   ]
 
   return (
@@ -24,15 +24,15 @@ export default function HomePage() {
             <div className="text-2xl text-white font-mono">{stats.total}</div>
           </div>
           <div className="border-l border-white/10 pl-4">
-            <div className="text-xs font-mono text-red-500 uppercase tracking-widest mb-1">Non-Conforming</div>
+            <div className="text-xs font-mono text-red-500 uppercase tracking-widest mb-1">Unsettled</div>
             <div className="text-2xl text-red-500 font-mono">{stats.nonConforming}</div>
           </div>
           <div className="border-l border-white/10 pl-4">
-            <div className="text-xs font-mono text-yellow-500 uppercase tracking-widest mb-1">Partial</div>
+            <div className="text-xs font-mono text-yellow-500 uppercase tracking-widest mb-1">Partially Settled</div>
             <div className="text-2xl text-yellow-500 font-mono">{stats.partial}</div>
           </div>
           <div className="border-l border-white/10 pl-4">
-            <div className="text-xs font-mono text-emerald-500 uppercase tracking-widest mb-1">Conforming</div>
+            <div className="text-xs font-mono text-emerald-500 uppercase tracking-widest mb-1">Settled</div>
             <div className="text-2xl text-white font-mono">{stats.conforming}</div>
           </div>
           <div className="border-l border-white/10 pl-4">
@@ -99,8 +99,8 @@ export default function HomePage() {
                     actor.status === 'PARTIALLY_CONFORMING' ? 'badge-partial' :
                     'badge-non-conforming'
                   }`}>
-                    {actor.status === 'NON_CONFORMING' ? 'OUT' :
-                     actor.status === 'PARTIALLY_CONFORMING' ? 'PARTIAL' : 'IN'}
+                    {actor.status === 'NON_CONFORMING' ? 'UNSETTLED' :
+                     actor.status === 'PARTIALLY_CONFORMING' ? 'PARTIAL' : 'SETTLED'}
                   </span>
                 </div>
                 <h4 className="text-white font-bold text-lg mb-2 group-hover:text-emerald-400 transition-colors">

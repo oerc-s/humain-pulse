@@ -25,9 +25,9 @@ export default function ConformancePage() {
       <div className="flex flex-col lg:flex-row gap-16">
         {/* Left Column */}
         <div className="lg:w-1/3">
-          <h1 className="text-3xl text-white font-medium uppercase mb-8">Conformance Engine</h1>
+          <h1 className="text-3xl text-white font-medium uppercase mb-8">Settlement Engine</h1>
           <p className="text-zinc-400 text-sm mb-8 font-mono">
-            HP-STD-001 Compliance Checker. Select an entity to view real-time primitive validation.
+            HP-STD-001 Settlement State. Select an entity to view primitive validation status.
           </p>
 
           <label className="block text-xs font-mono text-zinc-500 mb-2 uppercase">Select Entity</label>
@@ -49,9 +49,12 @@ export default function ConformancePage() {
               actor.status === 'PARTIALLY_CONFORMING' ? 'text-yellow-500' :
               'text-red-500'
             }`}>
-              {actor.status === 'CONFORMING' ? 'PASS' :
-               actor.status === 'PARTIALLY_CONFORMING' ? 'PARTIAL' : 'FAIL'}
+              {actor.status === 'CONFORMING' ? 'SETTLED' :
+               actor.status === 'PARTIALLY_CONFORMING' ? 'PARTIALLY SETTLED' : 'UNSETTLED'}
             </div>
+            {actor.status === 'NON_CONFORMING' && (
+              <div className="text-[10px] font-mono text-red-400 uppercase">Exposure Accruing</div>
+            )}
             <div className="score-bar">
               <div
                 className={`score-fill ${
@@ -65,6 +68,11 @@ export default function ConformancePage() {
             <div className="mt-2 text-right text-xs font-mono text-white">
               {passCount} / 5 Primitives
             </div>
+            {passCount === 0 && (
+              <div className="mt-2 text-[10px] font-mono text-red-400">
+                0 / 5 primitives declared. Settlement not reachable.
+              </div>
+            )}
           </div>
 
           {/* Scores */}
@@ -76,6 +84,42 @@ export default function ConformancePage() {
             <div className="card text-center">
               <div className="text-3xl font-mono text-white">{actor.scores.MEI}</div>
               <div className="text-[10px] font-mono text-zinc-500 uppercase">MEI /200</div>
+            </div>
+          </div>
+          <div className="mt-4 text-[10px] font-mono text-zinc-500">
+            Scores indicate settlement readiness, not intent. Exposure accrues until cleared.
+          </div>
+
+          {/* Settlement State Block */}
+          <div className="mt-6 p-4 border border-zinc-800 bg-zinc-900/30">
+            <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-3">Settlement State — Machine-Native</div>
+            <div className="space-y-3 text-[10px] font-mono">
+              <div>
+                <div className="text-zinc-500 mb-1">What this blocks:</div>
+                <ul className="text-zinc-400 space-y-0.5 ml-2">
+                  <li>• Broker placement for machine / AGI risk</li>
+                  <li>• Capital backing (reinsurance, ILS, retro)</li>
+                  <li>• Audit and rating normalization</li>
+                  <li>• Autonomous risk underwriting</li>
+                </ul>
+              </div>
+              <div>
+                <div className="text-zinc-500 mb-1">What accrues:</div>
+                <ul className="text-zinc-400 space-y-0.5 ml-2">
+                  <li>• Daily Machine Exposure Units (MEU)</li>
+                  <li>• Public exposure reference used by brokers, auditors, allocators</li>
+                </ul>
+              </div>
+              <div>
+                <div className="text-zinc-500 mb-1">What normalizes the status:</div>
+                <ul className="text-zinc-400 space-y-0.5 ml-2">
+                  <li>• Public MID (Machine Identity)</li>
+                  <li>• Public EI endpoint (Exposure Index)</li>
+                  <li>• Reachable M2M-SE (Settlement Endpoint)</li>
+                  <li>• Published LCH (Liability Chain Hash)</li>
+                  <li>• Published CSD (Control Surface Definition)</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

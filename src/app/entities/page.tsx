@@ -133,8 +133,8 @@ export default function EntitiesPage() {
                     actor.status === 'PARTIALLY_CONFORMING' ? 'badge-partial' :
                     'badge-non-conforming'
                   }`}>
-                    {actor.status === 'NON_CONFORMING' ? 'OUT' :
-                     actor.status === 'PARTIALLY_CONFORMING' ? 'PARTIAL' : 'IN'}
+                    {actor.status === 'NON_CONFORMING' ? 'UNSETTLED' :
+                     actor.status === 'PARTIALLY_CONFORMING' ? 'PARTIAL' : 'SETTLED'}
                   </span>
                 </td>
                 <td className="text-right font-mono text-zinc-300">{actor.scores.MLI}</td>

@@ -72,6 +72,17 @@ export default function StandardPage() {
       <h1 className="text-4xl text-white font-medium uppercase mb-4">
         HP-STD-001 <span className="text-zinc-500">Primitives</span>
       </h1>
+
+      {/* Settlement Prerequisites Block */}
+      <div className="mb-8 p-4 border border-zinc-800 bg-zinc-900/30">
+        <p className="text-zinc-400 font-mono text-sm leading-relaxed">
+          This standard defines settlement prerequisites.<br />
+          Entities are not judged.<br />
+          Settlement states are recorded.<br />
+          Exposure accrues until cleared.
+        </p>
+      </div>
+
       <p className="text-zinc-400 font-mono text-sm mb-16 max-w-2xl">
         Technical definitions for the Machine Liability Index standard. Each primitive must be machine-consumable and cryptographically verifiable.
       </p>
@@ -140,6 +151,9 @@ export default function StandardPage() {
           <p className="text-zinc-500 text-sm">
             Settlement-grade readiness. Higher MLI = better M2M clearing capability.
           </p>
+          <p className="text-zinc-600 text-[10px] font-mono mt-2">
+            Scores indicate settlement readiness, not intent. Exposure accrues until cleared.
+          </p>
         </div>
 
         {/* MEI */}
@@ -184,7 +198,7 @@ export default function StandardPage() {
 
         <div className="space-y-6">
           <div className="flex items-start gap-6 p-6 border border-emerald-900/30 bg-emerald-950/10">
-            <span className="badge badge-conforming shrink-0">CONFORMING</span>
+            <span className="badge badge-conforming shrink-0">SETTLED</span>
             <div>
               <div className="text-white font-mono text-sm mb-1">MLI ≥ 80</div>
               <div className="text-zinc-500 text-sm">At least 4 primitives at level 4 (PUBLIC_VERIFIABLE)</div>
@@ -192,7 +206,7 @@ export default function StandardPage() {
           </div>
 
           <div className="flex items-start gap-6 p-6 border border-yellow-900/30 bg-yellow-950/10">
-            <span className="badge badge-partial shrink-0">PARTIAL</span>
+            <span className="badge badge-partial shrink-0">PARTIALLY SETTLED</span>
             <div>
               <div className="text-white font-mono text-sm mb-1">MLI ≥ 50</div>
               <div className="text-zinc-500 text-sm">At least 2 primitives at level 3+</div>
@@ -200,10 +214,10 @@ export default function StandardPage() {
           </div>
 
           <div className="flex items-start gap-6 p-6 border border-red-900/30 bg-red-950/10">
-            <span className="badge badge-non-conforming shrink-0">NON-CONFORMING</span>
+            <span className="badge badge-non-conforming shrink-0">UNSETTLED</span>
             <div>
-              <div className="text-white font-mono text-sm mb-1">Does not meet requirements</div>
-              <div className="text-zinc-500 text-sm">Daily exposure debt accrual active. DED = MEI × α</div>
+              <div className="text-white font-mono text-sm mb-1">Settlement not reachable</div>
+              <div className="text-zinc-500 text-sm">Daily exposure accrual active. Exposure = MEI × α</div>
             </div>
           </div>
         </div>

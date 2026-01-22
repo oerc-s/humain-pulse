@@ -55,9 +55,9 @@ export default function ActorDetailPage() {
               isPartial ? 'badge-partial' :
               'badge-non-conforming'
             }`}>
-              {isConforming ? 'IN / CONFORMING' :
-               isPartial ? 'PARTIAL / IN PROGRESS' :
-               'OUT / NON-CONFORMING'}
+              {isConforming ? 'SETTLED' :
+               isPartial ? 'PARTIALLY SETTLED' :
+               'UNSETTLED'}
             </span>
           </div>
           <h1 className="text-5xl md:text-7xl text-white font-medium uppercase tracking-tight mb-2 leading-none">
@@ -120,6 +120,44 @@ export default function ActorDetailPage() {
                 />
               </div>
               <p className="text-[10px] text-zinc-600 font-mono">Total risk load · Model: {actor.mei_model}</p>
+            </div>
+          </div>
+
+          {/* Score Context */}
+          <div className="text-[10px] font-mono text-zinc-500 -mt-12 mb-8">
+            Scores indicate settlement readiness, not intent. Exposure accrues until cleared.
+          </div>
+
+          {/* Settlement State Block */}
+          <div className="p-4 border border-zinc-800 bg-zinc-900/30 mb-8">
+            <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest mb-3">Settlement State — Machine-Native</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-[10px] font-mono">
+              <div>
+                <div className="text-zinc-500 mb-1">What this blocks:</div>
+                <ul className="text-zinc-400 space-y-0.5">
+                  <li>• Broker placement for machine / AGI risk</li>
+                  <li>• Capital backing (reinsurance, ILS, retro)</li>
+                  <li>• Audit and rating normalization</li>
+                  <li>• Autonomous risk underwriting</li>
+                </ul>
+              </div>
+              <div>
+                <div className="text-zinc-500 mb-1">What accrues:</div>
+                <ul className="text-zinc-400 space-y-0.5">
+                  <li>• Daily Machine Exposure Units (MEU)</li>
+                  <li>• Public exposure reference used by brokers, auditors, allocators</li>
+                </ul>
+              </div>
+              <div>
+                <div className="text-zinc-500 mb-1">What normalizes the status:</div>
+                <ul className="text-zinc-400 space-y-0.5">
+                  <li>• Public MID (Machine Identity)</li>
+                  <li>• Public EI endpoint (Exposure Index)</li>
+                  <li>• Reachable M2M-SE (Settlement Endpoint)</li>
+                  <li>• Published LCH (Liability Chain Hash)</li>
+                  <li>• Published CSD (Control Surface Definition)</li>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -279,7 +317,7 @@ export default function ActorDetailPage() {
                 <span className="text-white">{actor.basis}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-zinc-400">Days Non-Conforming</span>
+                <span className="text-zinc-400">Days Unsettled</span>
                 <span className="text-red-400">{actor.debt.days_non_conforming}</span>
               </div>
             </div>
