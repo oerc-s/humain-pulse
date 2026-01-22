@@ -4,11 +4,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const navItems = [
-  { href: '/standard', label: 'Standard' },
-  { href: '/entities', label: 'Index' },
+  { href: '/entities', label: 'Entities' },
   { href: '/conformance', label: 'Conformance' },
-  { href: '/enforcement', label: 'Notices' },
-  { href: '/api-docs', label: 'API' },
+  { href: '/reinsurance', label: 'Reinsurance' },
+  { href: '/standard', label: 'Standard' },
 ]
 
 export function Navigation() {
@@ -21,7 +20,7 @@ export function Navigation() {
           href="/"
           className="font-bold text-sm tracking-tight hover:opacity-70 transition-opacity uppercase select-none text-white"
         >
-          Humain Pulse <span className="text-xs text-zinc-600 ml-2">HP-STD-001 REGISTRY</span>
+          Humain Pulse
         </Link>
 
         <div className="hidden md:flex gap-8 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">
@@ -41,10 +40,10 @@ export function Navigation() {
         </div>
 
         <Link
-          href="/conformance"
+          href="/entities"
           className="border border-white/20 bg-white/5 text-white px-4 py-2 font-mono text-[10px] uppercase tracking-widest hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all active:scale-95"
         >
-          Check Status
+          View Entities
         </Link>
       </div>
     </nav>
