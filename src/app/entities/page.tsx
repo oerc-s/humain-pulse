@@ -87,6 +87,23 @@ export default function EntitiesPage() {
         </div>
       </div>
 
+      {/* Capital Layer - Reinsurance Module Link */}
+      {filterLayer === 'Capital' && (
+        <Link
+          href="/reinsurance"
+          className="block mb-8 p-4 border border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-950/40 transition-colors group"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-emerald-500 font-mono text-[10px] uppercase tracking-widest mb-1">Specialized Registry</div>
+              <div className="text-white font-medium">Reinsurance Clearing Readiness</div>
+              <div className="text-zinc-500 text-xs font-mono mt-1">MLI, MEI, EI_ADJ, DRIFT metrics · 6 reinsurers tracked</div>
+            </div>
+            <div className="text-emerald-500 group-hover:translate-x-1 transition-transform">→</div>
+          </div>
+        </Link>
+      )}
+
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="data-table">
