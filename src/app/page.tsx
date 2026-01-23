@@ -10,11 +10,11 @@ export default function HomePage() {
 
         {/* HERO */}
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tighter text-white mb-8 uppercase leading-[0.9] max-w-4xl">
-          Exposure Accrues.<br />
-          <span className="text-emerald-500">Settlement Closes It.</span>
+          Clearing Operator<br />
+          <span className="text-emerald-500">Machine Liability</span>
         </h1>
         <p className="text-lg md:text-xl text-zinc-400 font-mono uppercase tracking-widest mb-16 max-w-2xl">
-          Machine-native clearing operator.
+          Settlement layer for autonomous systems.
         </p>
 
         {/* Live Clearing Surface */}
