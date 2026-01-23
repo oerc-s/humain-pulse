@@ -1,49 +1,44 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
+import { ACTORS } from '@/lib/data'
 import type { Layer } from '@/types'
-import type { ClearingActorWithExposure } from '@/lib/clearing/types'
 
 type TabFilter = 'All' | Layer
 
 export default function ActorsPage() {
-  const [actors, setActors] = useState<ClearingActorWithExposure[]>([])
   const [filterLayer, setFilterLayer] = useState<TabFilter>('All')
   const [searchTerm, setSearchTerm] = useState('')
 
-  useEffect(() => {
-    fetch('/api/clearing/actors')
-      .then(r => r.json())
-      .then(data => setActors(data.actors || []))
-  }, [])
-
   const filteredActors = useMemo(() => {
-    let list = [...actors]
+    let list = [...ACTORS]
 
     if (filterLayer !== 'All') {
-      list = list.filter(a => a.actor.layer === filterLayer)
+      list = list.filter(a => a.layer === filterLayer)
     }
 
     if (searchTerm.trim()) {
       const query = searchTerm.toLowerCase()
       list = list.filter(a =>
-        a.actor.name.toLowerCase().includes(query) ||
-        a.actor.sector.toLowerCase().includes(query)
+        a.name.toLowerCase().includes(query) ||
+        a.sector.toLowerCase().includes(query)
       )
     }
 
-    // Sort by status: UNSETTLED first, then PARTIAL, then SETTLED
-    list.sort((a, b) => {
-      const order = { UNSETTLED: 0, PARTIAL: 1, SETTLED: 2 }
-      return order[a.actor.status] - order[b.actor.status]
-    })
+    // Sort by MEI descending (highest exposure first)
+    list.sort((a, b) => b.scores.MEI - a.scores.MEI)
 
     return list
-  }, [actors, filterLayer, searchTerm])
+  }, [filterLayer, searchTerm])
 
   const tabs: TabFilter[] = ['All', 'Capital', 'Compute', 'Intelligence', 'Actuation']
-  const primitiveKeys = ['MID', 'EI', 'M2M_SE', 'LCH', 'CSD'] as const
+
+  const getStatusDisplay = (status: string) => {
+    if (status === 'CONFORMING') return 'SETTLED'
+    if (status === 'PARTIALLY_CONFORMING') return 'PARTIAL'
+    return 'UNSETTLED'
+  }
 
   return (
     <div className="pt-32 pb-20 px-6 md:px-12 min-h-screen max-w-[1800px] mx-auto animate-in">
@@ -74,13 +69,6 @@ export default function ActorsPage() {
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex gap-6 mb-6 text-[10px] font-mono text-zinc-500 border-b border-zinc-800 pb-4">
-        <span>Primitives: MID · EI · M2M-SE · LCH · CSD</span>
-        <span className="text-emerald-500">● = present</span>
-        <span className="text-zinc-600">○ = missing</span>
-      </div>
-
       {/* Capital Layer - Reinsurance Link */}
       {filterLayer === 'Capital' && (
         <Link
@@ -99,10 +87,11 @@ export default function ActorsPage() {
 
       {/* Entity List */}
       <div className="space-y-2">
-        {filteredActors.map(({ actor, exposure }) => (
-          <div
-            key={actor.actor_id}
-            className="border border-zinc-800 p-4 hover:border-zinc-700 transition-colors"
+        {filteredActors.map((actor) => (
+          <Link
+            key={actor.id}
+            href={`/actors/${actor.id}`}
+            className="block border border-zinc-800 p-4 hover:border-zinc-600 hover:bg-zinc-900/30 transition-colors"
           >
             <div className="flex items-center justify-between gap-4">
               {/* Name + Layer */}
@@ -111,35 +100,33 @@ export default function ActorsPage() {
                 <div className="text-zinc-600 text-[10px] font-mono uppercase">{actor.layer} · {actor.sector}</div>
               </div>
 
-              {/* Primitives */}
-              <div className="flex gap-1 font-mono text-sm">
-                {primitiveKeys.map(key => (
-                  <span
-                    key={key}
-                    className={actor.primitives[key] ? 'text-emerald-500' : 'text-zinc-700'}
-                    title={key}
-                  >
-                    {actor.primitives[key] ? '●' : '○'}
-                  </span>
-                ))}
-              </div>
-
               {/* Status */}
               <div className={`font-mono text-xs px-3 py-1 ${
-                actor.status === 'SETTLED' ? 'bg-emerald-900/30 text-emerald-400' :
-                actor.status === 'PARTIAL' ? 'bg-yellow-900/30 text-yellow-400' :
+                actor.status === 'CONFORMING' ? 'bg-emerald-900/30 text-emerald-400' :
+                actor.status === 'PARTIALLY_CONFORMING' ? 'bg-yellow-900/30 text-yellow-400' :
                 'bg-red-900/30 text-red-400'
               }`}>
-                {actor.status}
+                {getStatusDisplay(actor.status)}
               </div>
 
-              {/* MLI Score */}
-              <div className="text-right w-16">
-                <div className="text-white font-mono font-bold">{exposure.MLI}</div>
+              {/* MLI */}
+              <div className="text-right w-20">
+                <div className="text-white font-mono font-bold">{actor.scores.MLI}</div>
                 <div className="text-zinc-600 text-[10px] font-mono">MLI</div>
               </div>
+
+              {/* MEI */}
+              <div className="text-right w-20">
+                <div className={`font-mono font-bold ${actor.scores.MEI > 150 ? 'text-red-500' : actor.scores.MEI > 100 ? 'text-yellow-500' : 'text-zinc-300'}`}>
+                  {actor.scores.MEI}
+                </div>
+                <div className="text-zinc-600 text-[10px] font-mono">MEI</div>
+              </div>
+
+              {/* Arrow */}
+              <div className="text-zinc-600">→</div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -151,7 +138,7 @@ export default function ActorsPage() {
 
       {/* Summary */}
       <div className="mt-6 text-[10px] text-zinc-600 font-mono">
-        {filteredActors.length} entities · MLI = primitives present × 20
+        {filteredActors.length} entities · Sorted by MEI (highest exposure first)
       </div>
     </div>
   )

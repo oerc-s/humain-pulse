@@ -109,7 +109,7 @@ export default async function ActorPage({ params }: Props) {
         <div className="flex flex-col md:flex-row justify-between items-start mb-12 border-b border-white/10 pb-8 gap-8">
           <div>
             <Link href="/actors" className="text-zinc-500 hover:text-white font-mono text-[10px] uppercase mb-6 block tracking-widest">
-              ← Actors
+              ← Entities
             </Link>
             <div className="flex items-center gap-3 mb-4 flex-wrap">
               <span className="text-[10px] font-mono text-zinc-500 uppercase px-2 py-1 border border-zinc-800">{actor.layer}</span>
