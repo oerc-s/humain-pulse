@@ -116,20 +116,6 @@ export interface Notice {
   cycle_id?: string
 }
 
-// HP-STD-001 Invoice types
-export type InvoiceLineItem = 'Status Reconciliation' | 'Exposure Normalization' | 'Clearing Activation' | 'Index Maintenance'
-export type InvoiceStatus = 'pending' | 'issued' | 'paid'
-
-export interface Invoice {
-  ref: string  // HP-INV-{ACTOR}-{YYYYMMDD}-001
-  actor_id: string
-  actor_name: string
-  line_item: InvoiceLineItem
-  amount: number
-  cycle_id: string
-  due_date: string
-  status: InvoiceStatus
-}
 
 export interface Actor {
   id: string

@@ -7,8 +7,6 @@ import type {
   CashState,
   Notice,
   Evidence,
-  Invoice,
-  InvoiceLineItem,
   ReinsuranceMEIFactors,
   ComputeMEIFactors,
   IntelligenceMEIFactors,
@@ -605,30 +603,3 @@ export function getStats() {
   }
 }
 
-// Generate invoices for unsettled actors
-export function getInvoices(): Invoice[] {
-  const today = new Date().toISOString().split('T')[0].replace(/-/g, '')
-  const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-
-  return ACTORS
-    .filter(a => a.status !== 'CONFORMING')
-    .map((actor, idx) => {
-      const lineItem: InvoiceLineItem = actor.status === 'NON_CONFORMING'
-        ? 'Status Reconciliation'
-        : 'Exposure Normalization'
-      const amount = actor.status === 'NON_CONFORMING'
-        ? actor.scores.MEI * 100
-        : actor.scores.MEI * 50
-
-      return {
-        ref: `HP-INV-${actor.id.toUpperCase()}-${today}-${String(idx + 1).padStart(3, '0')}`,
-        actor_id: actor.id,
-        actor_name: actor.name,
-        line_item: lineItem,
-        amount,
-        cycle_id: CYCLE_ID,
-        due_date: dueDate,
-        status: 'pending' as const
-      }
-    })
-}
