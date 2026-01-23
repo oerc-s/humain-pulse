@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/clearing/recalculate",
+      "schedule": "0 * * * *"
+    }
+  ]
+}
