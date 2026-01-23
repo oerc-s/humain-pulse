@@ -7,7 +7,7 @@ import type { Layer } from '@/types'
 
 type TabFilter = 'All' | Layer
 
-export default function ActorsPage() {
+export default function EntitiesPage() {
   const [filterLayer, setFilterLayer] = useState<TabFilter>('All')
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -33,12 +33,6 @@ export default function ActorsPage() {
   }, [filterLayer, searchTerm])
 
   const tabs: TabFilter[] = ['All', 'Capital', 'Compute', 'Intelligence', 'Actuation']
-
-  const getStatusDisplay = (status: string) => {
-    if (status === 'CONFORMING') return 'SETTLED'
-    if (status === 'PARTIALLY_CONFORMING') return 'PARTIAL'
-    return 'UNSETTLED'
-  }
 
   return (
     <div className="pt-32 pb-20 px-6 md:px-12 min-h-screen max-w-[1800px] mx-auto animate-in">
@@ -69,62 +63,101 @@ export default function ActorsPage() {
         </div>
       </div>
 
-      {/* Capital Layer - Reinsurance Link */}
-      {filterLayer === 'Capital' && (
-        <Link
-          href="/reinsurance"
-          className="block mb-6 p-4 border border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-950/40 transition-colors group"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-emerald-500 font-mono text-[10px] uppercase tracking-widest mb-1">Reinsurance Layer</div>
-              <div className="text-white font-medium">6 reinsurers · Detailed settlement metrics</div>
-            </div>
-            <div className="text-emerald-500 group-hover:translate-x-1 transition-transform">→</div>
-          </div>
-        </Link>
-      )}
+      {/* League Table Header */}
+      <div className="hidden md:grid grid-cols-12 gap-4 py-3 border-b border-white/10 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">
+        <div className="col-span-3">Actor</div>
+        <div className="col-span-1 text-center">Status</div>
+        <div className="col-span-1 text-right">MEI</div>
+        <div className="col-span-1 text-right">ΔMEI_24h</div>
+        <div className="col-span-1 text-right">MLI</div>
+        <div className="col-span-1 text-right">ΔMLI_24h</div>
+        <div className="col-span-2 text-center">Cash_State</div>
+        <div className="col-span-2 text-right">Timestamp</div>
+      </div>
 
       {/* Entity List */}
-      <div className="space-y-2">
+      <div className="space-y-1">
         {filteredActors.map((actor) => (
           <Link
             key={actor.id}
             href={`/actors/${actor.id}`}
-            className="block border border-zinc-800 p-4 hover:border-zinc-600 hover:bg-zinc-900/30 transition-colors"
+            className="block border border-zinc-800/50 hover:border-zinc-600 hover:bg-zinc-900/30 transition-colors"
           >
-            <div className="flex items-center justify-between gap-4">
-              {/* Name + Layer */}
-              <div className="flex-1 min-w-0">
-                <div className="text-white font-bold truncate">{actor.name}</div>
-                <div className="text-zinc-600 text-[10px] font-mono uppercase">{actor.layer} · {actor.sector}</div>
+            {/* Desktop View */}
+            <div className="hidden md:grid grid-cols-12 gap-4 py-3 px-4 items-center font-mono text-sm">
+              <div className="col-span-3">
+                <div className="text-white font-bold">{actor.name}</div>
+                <div className="text-zinc-600 text-[10px] uppercase">{actor.layer} · {actor.sector}</div>
               </div>
-
-              {/* Status */}
-              <div className={`font-mono text-xs px-3 py-1 ${
-                actor.status === 'CONFORMING' ? 'bg-emerald-900/30 text-emerald-400' :
-                actor.status === 'PARTIALLY_CONFORMING' ? 'bg-yellow-900/30 text-yellow-400' :
-                'bg-red-900/30 text-red-400'
-              }`}>
-                {getStatusDisplay(actor.status)}
+              <div className="col-span-1 text-center">
+                <span className={`text-[10px] uppercase px-2 py-1 ${
+                  actor.settlement_status === 'SETTLED' ? 'bg-emerald-900/30 text-emerald-400' :
+                  actor.settlement_status === 'PARTIAL' ? 'bg-yellow-900/30 text-yellow-400' :
+                  'bg-red-900/30 text-red-400'
+                }`}>
+                  {actor.settlement_status}
+                </span>
               </div>
-
-              {/* MLI */}
-              <div className="text-right w-20">
-                <div className="text-white font-mono font-bold">{actor.scores.MLI}</div>
-                <div className="text-zinc-600 text-[10px] font-mono">MLI</div>
-              </div>
-
-              {/* MEI */}
-              <div className="text-right w-20">
-                <div className={`font-mono font-bold ${actor.scores.MEI > 150 ? 'text-red-500' : actor.scores.MEI > 100 ? 'text-yellow-500' : 'text-zinc-300'}`}>
+              <div className="col-span-1 text-right">
+                <span className={actor.scores.MEI > 150 ? 'text-red-500' : 'text-zinc-300'}>
                   {actor.scores.MEI}
-                </div>
-                <div className="text-zinc-600 text-[10px] font-mono">MEI</div>
+                </span>
               </div>
+              <div className="col-span-1 text-right text-red-400">
+                +{actor.scores.ΔMEI_24h || 0}
+              </div>
+              <div className="col-span-1 text-right text-zinc-300">
+                {actor.scores.MLI}
+              </div>
+              <div className="col-span-1 text-right text-zinc-500">
+                {actor.scores.ΔMLI_24h || 0}
+              </div>
+              <div className="col-span-2 text-center">
+                <span className={`text-[10px] uppercase ${
+                  actor.cash_state === 'cleared' ? 'text-emerald-400' :
+                  actor.cash_state === 'mismatch' ? 'text-yellow-400' : 'text-red-400'
+                }`}>
+                  {actor.cash_state}
+                </span>
+              </div>
+              <div className="col-span-2 text-right text-zinc-600 text-xs">
+                {actor.timestamp}
+              </div>
+            </div>
 
-              {/* Arrow */}
-              <div className="text-zinc-600">→</div>
+            {/* Mobile View */}
+            <div className="md:hidden p-4">
+              <div className="flex items-center justify-between gap-4 mb-2">
+                <div className="text-white font-bold">{actor.name}</div>
+                <span className={`text-[10px] font-mono uppercase px-2 py-1 ${
+                  actor.settlement_status === 'SETTLED' ? 'bg-emerald-900/30 text-emerald-400' :
+                  actor.settlement_status === 'PARTIAL' ? 'bg-yellow-900/30 text-yellow-400' :
+                  'bg-red-900/30 text-red-400'
+                }`}>
+                  {actor.settlement_status}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 gap-2 font-mono text-xs">
+                <div>
+                  <div className="text-zinc-600 text-[10px]">MEI</div>
+                  <div className={actor.scores.MEI > 150 ? 'text-red-500' : 'text-zinc-300'}>{actor.scores.MEI}</div>
+                </div>
+                <div>
+                  <div className="text-zinc-600 text-[10px]">ΔMEI</div>
+                  <div className="text-red-400">+{actor.scores.ΔMEI_24h || 0}</div>
+                </div>
+                <div>
+                  <div className="text-zinc-600 text-[10px]">MLI</div>
+                  <div className="text-zinc-300">{actor.scores.MLI}</div>
+                </div>
+                <div>
+                  <div className="text-zinc-600 text-[10px]">Cash</div>
+                  <div className={
+                    actor.cash_state === 'cleared' ? 'text-emerald-400' :
+                    actor.cash_state === 'mismatch' ? 'text-yellow-400' : 'text-red-400'
+                  }>{actor.cash_state}</div>
+                </div>
+              </div>
             </div>
           </Link>
         ))}
@@ -138,7 +171,7 @@ export default function ActorsPage() {
 
       {/* Summary */}
       <div className="mt-6 text-[10px] text-zinc-600 font-mono">
-        {filteredActors.length} entities · Sorted by MEI (highest exposure first)
+        {filteredActors.length} entities · Cycle: HP-STD-001 v1.10
       </div>
     </div>
   )

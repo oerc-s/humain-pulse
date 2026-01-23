@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     'settlement layer',
     'exposure normalization',
     'machine-native clearing',
-    'HP-001',
+    'HP-STD-001',
     'exposure accrual',
     'state transition',
     'clearing execution'

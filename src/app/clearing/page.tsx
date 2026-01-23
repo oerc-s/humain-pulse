@@ -101,14 +101,19 @@ export default function ClearingPage() {
         <div className="border border-red-900/30 bg-red-950/10 p-6">
           <div className="text-zinc-300 font-mono text-sm space-y-2">
             <div>MEI &gt; 0 → Exposure active</div>
-            <div>UNSETTLED → Exposure accrues</div>
-            <div>SETTLED → Exposure normalized</div>
+            <div>UNSETTLED → Exposure accrues (ΔMEI_24h &gt; 0)</div>
+            <div>SETTLED → Exposure normalized (ΔMEI_24h = 0)</div>
           </div>
           <div className="text-zinc-500 text-xs font-mono mt-4 pt-4 border-t border-red-900/30">
             Clearing is the only state modifier.
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <div className="mt-12 pt-8 border-t border-white/10 text-[10px] font-mono text-zinc-600">
+        Last clearing cycle: 2026-01-23 · HP-STD-001 v1.10
+      </div>
     </div>
   )
 }

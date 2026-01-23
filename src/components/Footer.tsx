@@ -10,7 +10,7 @@ export function Footer() {
           </div>
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="font-mono text-[10px] text-zinc-600 uppercase tracking-widest">
-              <span className="text-zinc-400">HP-001</span> · MID · EI · M2M-SE · LCH · CSD
+              <span className="text-zinc-400">HP-STD-001</span> · MID · EI · M2M-SE · LCH · CSD
             </div>
             <div className="font-mono text-[10px] text-zinc-600">
               Last clearing cycle: {LAST_PUBLISH_DATE}

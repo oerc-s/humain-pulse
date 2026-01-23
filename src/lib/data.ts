@@ -3,8 +3,12 @@ import type {
   Primitives,
   PrimitiveScore,
   ConformanceStatus,
+  SettlementStatus,
+  CashState,
   Notice,
   Evidence,
+  Invoice,
+  InvoiceLineItem,
   ReinsuranceMEIFactors,
   ComputeMEIFactors,
   IntelligenceMEIFactors,
@@ -13,6 +17,22 @@ import type {
 import { getStatusFromScore, calculateDailyDebt } from './scoring'
 
 const REVIEW_DATE = '2026-01-20'
+const CYCLE_ID = 'HP-STD-001 v1.10'
+const TIMESTAMP = '2026-01-23T00:00:00Z'
+
+// Convert legacy status to HP-STD-001 settlement status
+function toSettlementStatus(status: ConformanceStatus): SettlementStatus {
+  if (status === 'CONFORMING') return 'SETTLED'
+  if (status === 'PARTIALLY_CONFORMING') return 'PARTIAL'
+  return 'UNSETTLED'
+}
+
+// Derive cash state from settlement status
+function deriveCashState(status: SettlementStatus): CashState {
+  if (status === 'SETTLED') return 'cleared'
+  if (status === 'PARTIAL') return 'mismatch'
+  return 'accumulating'
+}
 
 // Helper to create primitives from scores
 function createPrimitives(mid: PrimitiveScore, ei: PrimitiveScore, m2m: PrimitiveScore, lch: PrimitiveScore, csd: PrimitiveScore): Primitives {
@@ -26,18 +46,30 @@ function createPrimitives(mid: PrimitiveScore, ei: PrimitiveScore, m2m: Primitiv
 }
 
 // Generate MEDs (Machine Exposure Documents) for unsettled actors
-function generateNotices(id: string, name: string, status: ConformanceStatus, mli: number): Notice[] {
+function generateNotices(id: string, name: string, status: ConformanceStatus, mli: number, mei: number): Notice[] {
   if (status === 'CONFORMING') return []
 
-  const statusLabel = status === 'NON_CONFORMING' ? 'UNSETTLED' : 'PARTIAL'
+  const settlementStatus = toSettlementStatus(status)
+  const cashState = deriveCashState(settlementStatus)
+  const deltaMLI = 0 // No change in 24h by default
+  const deltaMEI = status === 'CONFORMING' ? 0 : Math.round(mei * 0.02) // 2% daily accrual
 
   const notices: Notice[] = [{
     id: `MED-${id.toUpperCase()}-2026-001`,
     date: REVIEW_DATE,
     type: 'NON_CONFORMANCE',
-    title: `Exposure State: ${statusLabel}`,
-    summary: `${name} clearing state: ${statusLabel}. MLI: ${mli}/100. Settlement primitives incomplete. Exposure accrues.`,
-    severity: status === 'NON_CONFORMING' ? 'HIGH' : 'MODERATE'
+    title: `HP-STD-001 Status: ${settlementStatus}`,
+    summary: `${name} clearing state: ${settlementStatus}. MLI: ${mli}/100. MEI: ${mei}/200. Exposure accrues.`,
+    severity: status === 'NON_CONFORMING' ? 'HIGH' : 'MODERATE',
+    actor_id: id,
+    status: settlementStatus,
+    MEI: mei,
+    ΔMEI_24h: deltaMEI,
+    MLI: mli,
+    ΔMLI_24h: deltaMLI,
+    cash_state: cashState,
+    timestamp: TIMESTAMP,
+    cycle_id: CYCLE_ID
   }]
 
   if (mli < 20) {
@@ -45,9 +77,18 @@ function generateNotices(id: string, name: string, status: ConformanceStatus, ml
       id: `MED-${id.toUpperCase()}-2026-002`,
       date: REVIEW_DATE,
       type: 'DEBT_ACCRUAL',
-      title: 'Critical Exposure Accrual',
+      title: 'EDA — Exposure Debt Accrual: CRITICAL',
       summary: `MLI below 20. Accrual multiplier active. Settlement blocked.`,
-      severity: 'CRITICAL'
+      severity: 'CRITICAL',
+      actor_id: id,
+      status: settlementStatus,
+      MEI: mei,
+      ΔMEI_24h: deltaMEI,
+      MLI: mli,
+      ΔMLI_24h: deltaMLI,
+      cash_state: cashState,
+      timestamp: TIMESTAMP,
+      cycle_id: CYCLE_ID
     })
   }
 
@@ -56,10 +97,31 @@ function generateNotices(id: string, name: string, status: ConformanceStatus, ml
 
 // ===== ACTORS WITH EXACT SCORES FROM SPEC =====
 
+// Helper to create actor with HP-STD-001 fields
+function createActor(base: Omit<Actor, 'settlement_status' | 'cash_state' | 'cycle_id' | 'timestamp' | 'scores'> & { scores: { MLI: number; MEI: number } }): Actor {
+  const settlementStatus = toSettlementStatus(base.status)
+  const cashState = deriveCashState(settlementStatus)
+  const deltaMEI = base.status === 'CONFORMING' ? 0 : Math.round(base.scores.MEI * 0.02)
+  const deltaMLI = 0
+
+  return {
+    ...base,
+    scores: {
+      ...base.scores,
+      ΔMEI_24h: deltaMEI,
+      ΔMLI_24h: deltaMLI
+    },
+    settlement_status: settlementStatus,
+    cash_state: cashState,
+    cycle_id: CYCLE_ID,
+    timestamp: TIMESTAMP
+  }
+}
+
 export const ACTORS: Actor[] = [
   // ============ CAPITAL / REINSURANCE ============
   // Munich Re: MLI 10, MEI 148
-  {
+  createActor({
     id: 'munich-re',
     name: 'Munich Re',
     layer: 'Capital',
@@ -67,8 +129,8 @@ export const ACTORS: Actor[] = [
     website: 'https://munichre.com',
     headquarters_country: 'DE',
     basis: 'HP-STD-001',
-    primitives: createPrimitives(1, 0, 0, 1, 0), // sum=2, MLI=10
-    mei_factors: { AI_UW: 4, PORTFOLIO_AI: 4, ACCUMULATION: 4, TRIGGERS: 3, LATENCY: 3, RETROCESSION: 4, CLAIMS_AUTOMATION: 3 } as ReinsuranceMEIFactors, // 25×6=150 ≈ 148
+    primitives: createPrimitives(1, 0, 0, 1, 0),
+    mei_factors: { AI_UW: 4, PORTFOLIO_AI: 4, ACCUMULATION: 4, TRIGGERS: 3, LATENCY: 3, RETROCESSION: 4, CLAIMS_AUTOMATION: 3 } as ReinsuranceMEIFactors,
     mei_model: 'MEI_reinsurance',
     scores: { MLI: 10, MEI: 148 },
     status: 'NON_CONFORMING',
@@ -76,9 +138,9 @@ export const ACTORS: Actor[] = [
     evidence: [{ id: 'E001', primitive: 'MID', claim_text: 'Annual Disclosure 2025', evidence_url: 'https://munichre.com/disclosure', tier: 'WEAK_PROXY', language: 'en', extracted_snippet: 'Risk management framework described...', date: REVIEW_DATE }],
     notices: [],
     last_review_date: REVIEW_DATE
-  },
+  }),
   // Swiss Re: MLI 10, MEI 142
-  {
+  createActor({
     id: 'swiss-re',
     name: 'Swiss Re',
     layer: 'Capital',
@@ -86,8 +148,8 @@ export const ACTORS: Actor[] = [
     website: 'https://swissre.com',
     headquarters_country: 'CH',
     basis: 'HP-STD-001',
-    primitives: createPrimitives(1, 1, 0, 0, 0), // sum=2, MLI=10
-    mei_factors: { AI_UW: 4, PORTFOLIO_AI: 3, ACCUMULATION: 4, TRIGGERS: 3, LATENCY: 3, RETROCESSION: 4, CLAIMS_AUTOMATION: 3 } as ReinsuranceMEIFactors, // 24×6=144 ≈ 142
+    primitives: createPrimitives(1, 1, 0, 0, 0),
+    mei_factors: { AI_UW: 4, PORTFOLIO_AI: 3, ACCUMULATION: 4, TRIGGERS: 3, LATENCY: 3, RETROCESSION: 4, CLAIMS_AUTOMATION: 3 } as ReinsuranceMEIFactors,
     mei_model: 'MEI_reinsurance',
     scores: { MLI: 10, MEI: 142 },
     status: 'NON_CONFORMING',
@@ -95,9 +157,9 @@ export const ACTORS: Actor[] = [
     evidence: [{ id: 'E002', primitive: 'MID', claim_text: 'Risk Framework PDF', evidence_url: 'https://swissre.com/risk', tier: 'WEAK_PROXY', language: 'en', extracted_snippet: 'Framework overview...', date: REVIEW_DATE }],
     notices: [],
     last_review_date: REVIEW_DATE
-  },
+  }),
   // SCOR: MLI 20, MEI 126
-  {
+  createActor({
     id: 'scor',
     name: 'SCOR',
     layer: 'Capital',
@@ -105,8 +167,8 @@ export const ACTORS: Actor[] = [
     website: 'https://scor.com',
     headquarters_country: 'FR',
     basis: 'HP-STD-001',
-    primitives: createPrimitives(1, 1, 1, 1, 0), // sum=4, MLI=20
-    mei_factors: { AI_UW: 3, PORTFOLIO_AI: 3, ACCUMULATION: 3, TRIGGERS: 3, LATENCY: 3, RETROCESSION: 3, CLAIMS_AUTOMATION: 3 } as ReinsuranceMEIFactors, // 21×6=126
+    primitives: createPrimitives(1, 1, 1, 1, 0),
+    mei_factors: { AI_UW: 3, PORTFOLIO_AI: 3, ACCUMULATION: 3, TRIGGERS: 3, LATENCY: 3, RETROCESSION: 3, CLAIMS_AUTOMATION: 3 } as ReinsuranceMEIFactors,
     mei_model: 'MEI_reinsurance',
     scores: { MLI: 20, MEI: 126 },
     status: 'NON_CONFORMING',
@@ -114,7 +176,7 @@ export const ACTORS: Actor[] = [
     evidence: [],
     notices: [],
     last_review_date: REVIEW_DATE
-  },
+  }),
   // Hannover Re: MLI 10, MEI 120
   {
     id: 'hannover-re',
@@ -471,9 +533,32 @@ export const ACTORS: Actor[] = [
   }
 ]
 
-// Generate notices for all actors
+// Post-process actors to add HP-STD-001 fields
 ACTORS.forEach(actor => {
-  actor.notices = generateNotices(actor.id, actor.name, actor.status, actor.scores.MLI)
+  // Add settlement status
+  if (!actor.settlement_status) {
+    actor.settlement_status = toSettlementStatus(actor.status)
+  }
+  // Add cash state
+  if (!actor.cash_state) {
+    actor.cash_state = deriveCashState(actor.settlement_status)
+  }
+  // Add cycle_id and timestamp
+  if (!actor.cycle_id) {
+    actor.cycle_id = CYCLE_ID
+  }
+  if (!actor.timestamp) {
+    actor.timestamp = TIMESTAMP
+  }
+  // Add delta fields
+  if (actor.scores.ΔMEI_24h === undefined) {
+    actor.scores.ΔMEI_24h = actor.status === 'CONFORMING' ? 0 : Math.round(actor.scores.MEI * 0.02)
+  }
+  if (actor.scores.ΔMLI_24h === undefined) {
+    actor.scores.ΔMLI_24h = 0
+  }
+  // Generate notices
+  actor.notices = generateNotices(actor.id, actor.name, actor.status, actor.scores.MLI, actor.scores.MEI)
 })
 
 // Helper functions
@@ -518,4 +603,32 @@ export function getStats() {
       Actuation: getActorsByLayer('Actuation').length
     }
   }
+}
+
+// Generate invoices for unsettled actors
+export function getInvoices(): Invoice[] {
+  const today = new Date().toISOString().split('T')[0].replace(/-/g, '')
+  const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+
+  return ACTORS
+    .filter(a => a.status !== 'CONFORMING')
+    .map((actor, idx) => {
+      const lineItem: InvoiceLineItem = actor.status === 'NON_CONFORMING'
+        ? 'Status Reconciliation'
+        : 'Exposure Normalization'
+      const amount = actor.status === 'NON_CONFORMING'
+        ? actor.scores.MEI * 100
+        : actor.scores.MEI * 50
+
+      return {
+        ref: `HP-INV-${actor.id.toUpperCase()}-${today}-${String(idx + 1).padStart(3, '0')}`,
+        actor_id: actor.id,
+        actor_name: actor.name,
+        line_item: lineItem,
+        amount,
+        cycle_id: CYCLE_ID,
+        due_date: dueDate,
+        status: 'pending' as const
+      }
+    })
 }

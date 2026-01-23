@@ -10,7 +10,14 @@ export type PrimitiveScore = 0 | 1 | 2 | 3 | 4
 
 export type PrimitiveStatus = 'ABSENT' | 'CONCEPTUAL' | 'PROXY' | 'PARTIAL_PUBLIC' | 'PUBLIC_VERIFIABLE'
 
+// HP-STD-001 Settlement States
+export type SettlementStatus = 'UNSETTLED' | 'PARTIAL' | 'SETTLED' | 'OBSERVED'
+
+// Legacy conformance mapping
 export type ConformanceStatus = 'NON_CONFORMING' | 'PARTIALLY_CONFORMING' | 'CONFORMING'
+
+// Cash state for AP reconciliation
+export type CashState = 'accumulating' | 'mismatch' | 'cleared'
 
 export type NoticeType = 'NON_CONFORMANCE' | 'EXPOSURE_UPDATE' | 'DEBT_ACCRUAL' | 'STATUS_CHANGE'
 
@@ -97,6 +104,31 @@ export interface Notice {
   title: string
   summary: string
   severity: 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL'
+  // HP-STD-001 required fields
+  actor_id?: string
+  status?: SettlementStatus
+  MEI?: number
+  ΔMEI_24h?: number
+  MLI?: number
+  ΔMLI_24h?: number
+  cash_state?: CashState
+  timestamp?: string
+  cycle_id?: string
+}
+
+// HP-STD-001 Invoice types
+export type InvoiceLineItem = 'Status Reconciliation' | 'Exposure Normalization' | 'Clearing Activation' | 'Index Maintenance'
+export type InvoiceStatus = 'pending' | 'issued' | 'paid'
+
+export interface Invoice {
+  ref: string  // HP-INV-{ACTOR}-{YYYYMMDD}-001
+  actor_id: string
+  actor_name: string
+  line_item: InvoiceLineItem
+  amount: number
+  cycle_id: string
+  due_date: string
+  status: InvoiceStatus
 }
 
 export interface Actor {
@@ -113,8 +145,14 @@ export interface Actor {
   scores: {
     MLI: number  // 0-100
     MEI: number  // 0-200
+    ΔMEI_24h?: number  // 24h delta (added by post-init)
+    ΔMLI_24h?: number  // 24h delta (added by post-init)
   }
   status: ConformanceStatus
+  settlement_status?: SettlementStatus  // Added by post-init
+  cash_state?: CashState  // Added by post-init
+  cycle_id?: string  // Added by post-init
+  timestamp?: string  // Added by post-init
   debt: Debt
   evidence: Evidence[]
   notices: Notice[]

@@ -7,6 +7,7 @@ const navItems = [
   { href: '/actors', label: 'Entities' },
   { href: '/clearing', label: 'Settlement' },
   { href: '/notices', label: 'Notices' },
+  { href: '/invoices', label: 'Invoices' },
   { href: '/api-docs', label: 'API' },
 ]
 

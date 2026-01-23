@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Clearing API',
-  description: 'Machine integration endpoints. JSON only. Clearing state, actors, notices, metrics.',
-  keywords: ['clearing API', 'machine integration', 'JSON API', 'clearing endpoints'],
+  description: 'HP-STD-001 machine integration endpoints. JSON only.',
+  keywords: ['clearing API', 'HP-STD-001', 'JSON API', 'machine integration'],
 }
 
 export default function ApiDocsPage() {
@@ -15,16 +15,20 @@ export default function ApiDocsPage() {
       response: `{
   "actors": [
     {
-      "actor_id": "HP-ACT-001",
+      "actor_id": "munich-re",
       "name": "Munich Re",
-      "sector": "REINSURANCE",
+      "sector": "Reinsurance",
       "status": "UNSETTLED",
       "MEI": 148,
-      "MLI": 20,
-      "last_state_change": "2026-01-20T00:00:00Z"
+      "ΔMEI_24h": 3,
+      "MLI": 10,
+      "ΔMLI_24h": 0,
+      "cash_state": "accumulating",
+      "timestamp": "2026-01-23T00:00:00Z",
+      "cycle_id": "HP-STD-001 v1.10"
     }
   ],
-  "total": 21
+  "total": 22
 }`
     },
     {
@@ -32,11 +36,14 @@ export default function ApiDocsPage() {
       path: '/api/clearing/state',
       desc: 'Live clearing surface metrics',
       response: `{
-  "unsettled": 15,
+  "unsettled": 17,
   "partial": 4,
-  "settled": 2,
-  "total_exposure_day": 380,
-  "last_clearing_cycle": "2026-01-23T12:00:00Z"
+  "settled": 1,
+  "observed": 0,
+  "total_MEI": 2840,
+  "total_ΔMEI_24h": 56,
+  "cycle_id": "HP-STD-001 v1.10",
+  "timestamp": "2026-01-23T12:00:00Z"
 }`
     },
     {
@@ -44,21 +51,24 @@ export default function ApiDocsPage() {
       path: '/api/clearing/actors/:id',
       desc: 'Single actor clearing state',
       response: `{
-  "actor_id": "HP-ACT-001",
+  "actor_id": "munich-re",
   "name": "Munich Re",
-  "sector": "REINSURANCE",
+  "sector": "Reinsurance",
   "status": "UNSETTLED",
   "primitives": {
-    "MID": false,
+    "MID": true,
     "EI": false,
     "M2M_SE": false,
-    "LCH": false,
+    "LCH": true,
     "CSD": false
   },
   "MEI": 148,
-  "MLI": 0,
-  "exposure_day": 22,
-  "last_state_change": "2026-01-20T00:00:00Z"
+  "ΔMEI_24h": 3,
+  "MLI": 10,
+  "ΔMLI_24h": 0,
+  "cash_state": "accumulating",
+  "timestamp": "2026-01-23T00:00:00Z",
+  "cycle_id": "HP-STD-001 v1.10"
 }`
     },
     {
@@ -68,26 +78,39 @@ export default function ApiDocsPage() {
       response: `{
   "notices": [
     {
-      "notice_id": "HP-CLR-20260120-001",
-      "actor_id": "HP-ACT-001",
+      "notice_id": "MED-MUNICH-RE-2026-001",
+      "actor_id": "munich-re",
       "status": "UNSETTLED",
-      "trigger": "primitives_missing",
-      "timestamp": "2026-01-20T00:00:00Z"
+      "MEI": 148,
+      "ΔMEI_24h": 3,
+      "MLI": 10,
+      "ΔMLI_24h": 0,
+      "cash_state": "accumulating",
+      "timestamp": "2026-01-23T00:00:00Z",
+      "cycle_id": "HP-STD-001 v1.10"
     }
   ],
-  "total": 42
+  "total": 35
 }`
     },
     {
       method: 'GET',
-      path: '/api/clearing/metrics',
-      desc: 'Aggregated clearing metrics',
+      path: '/api/clearing/invoices',
+      desc: 'AP-ready invoice objects',
       response: `{
-  "total_actors": 21,
-  "avg_MEI": 142,
-  "avg_MLI": 35,
-  "total_exposure_accrued": 12500,
-  "last_update": "2026-01-23T12:00:00Z"
+  "invoices": [
+    {
+      "ref": "HP-INV-MUNICH-RE-20260123-001",
+      "actor_id": "munich-re",
+      "actor_name": "Munich Re",
+      "line_item": "Status Reconciliation",
+      "amount": 14800,
+      "cycle_id": "HP-STD-001 v1.10",
+      "due_date": "2026-02-22",
+      "status": "pending"
+    }
+  ],
+  "total": 21
 }`
     }
   ]
@@ -95,8 +118,8 @@ export default function ApiDocsPage() {
   return (
     <div className="pt-32 pb-24 px-6 md:px-12 max-w-[1400px] mx-auto animate-in">
       <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-4">Clearing API</h1>
-      <p className="text-zinc-400 font-mono text-sm mb-8">
-        Machine integration. JSON only.
+      <p className="text-zinc-500 font-mono text-sm mb-8">
+        HP-STD-001 machine integration. JSON only.
       </p>
 
       {/* Base URL */}
@@ -149,6 +172,31 @@ export default function ApiDocsPage() {
             <div className="text-zinc-500 text-xs">Detected, unattributed</div>
           </div>
         </div>
+      </div>
+
+      {/* Cash States */}
+      <div className="border border-zinc-800 bg-zinc-900/20 p-6 mt-6">
+        <h2 className="font-mono text-sm uppercase tracking-widest text-emerald-500 mb-6 border-b border-white/10 pb-2">
+          Cash States
+        </h2>
+        <div className="grid grid-cols-3 gap-4 font-mono text-sm">
+          <div>
+            <div className="text-red-400 font-bold">accumulating</div>
+            <div className="text-zinc-500 text-xs">Exposure debt active</div>
+          </div>
+          <div>
+            <div className="text-yellow-400 font-bold">mismatch</div>
+            <div className="text-zinc-500 text-xs">Partial reconciliation</div>
+          </div>
+          <div>
+            <div className="text-emerald-400 font-bold">cleared</div>
+            <div className="text-zinc-500 text-xs">Settlement complete</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8 text-[10px] font-mono text-zinc-600">
+        Cycle: HP-STD-001 v1.10
       </div>
     </div>
   )
