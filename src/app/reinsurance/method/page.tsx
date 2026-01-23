@@ -3,7 +3,7 @@ export default function MethodPage() {
     <div className="pt-32 pb-24 px-6 md:px-12 max-w-4xl mx-auto animate-in">
       <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-4">Method</h1>
       <p className="text-zinc-400 font-mono text-sm mb-12">
-        Scoring methodology for reinsurance clearing readiness under HP-STD-001 / ASI-STD-001.
+        Scoring methodology for reinsurance clearing capacity under HP-STD-001 / ASI-STD-001.
       </p>
 
       {/* Primitives */}
@@ -12,7 +12,7 @@ export default function MethodPage() {
           Primitives
         </h2>
         <p className="text-zinc-400 text-sm mb-4 font-mono leading-relaxed">
-          Five machine-readable primitives determine clearing readiness. Each must be public and verifiable.
+          Five machine-readable primitives determine clearing capacity. Each must be public and verifiable.
         </p>
         <div className="space-y-3">
           <div className="border-l-2 border-zinc-800 pl-4">
@@ -41,7 +41,7 @@ export default function MethodPage() {
       {/* MLI */}
       <section className="mb-12">
         <h2 className="font-mono text-sm uppercase tracking-widest text-emerald-500 mb-4 border-b border-white/10 pb-2">
-          MLI — Clearing Readiness (0-100)
+          MLI — Clearing Capacity (0-100)
         </h2>
         <div className="bg-black border border-zinc-800 p-4 mb-4 font-mono text-sm">
           <code className="text-emerald-400">MLI = 25 × (MID_ok + M2M_ok + LCH_ok + CSD_ok)</code>
@@ -132,27 +132,25 @@ export default function MethodPage() {
           </div>
 
           <div>
-            <div className="text-xs text-zinc-500 font-mono uppercase mb-2">LCH Hash Publication</div>
+            <div className="text-xs text-zinc-500 font-mono uppercase mb-2">LCH Publication</div>
             <pre className="bg-black border border-zinc-800 p-4 text-xs text-zinc-400 font-mono overflow-x-auto">
 {`{
   "timestamp": "2026-01-22T00:00:00Z",
-  "root_hash": "0x8f2d7a1b3c4e5f6a...",
-  "prev_hash": "0x9a1b4e2f7c8d9e0a...",
+  "chain_id": "lch:munich-re:001",
   "height": 104502,
-  "method": "merkle-sha256"
+  "transitions_count": 542
 }`}
             </pre>
           </div>
 
           <div>
-            <div className="text-xs text-zinc-500 font-mono uppercase mb-2">M2M-SE Contract Reference</div>
+            <div className="text-xs text-zinc-500 font-mono uppercase mb-2">M2M-SE Settlement Endpoint</div>
             <pre className="bg-black border border-zinc-800 p-4 text-xs text-zinc-400 font-mono overflow-x-auto">
 {`{
   "endpoint": "wss://settle.reinsurer.com/v1",
-  "contract_address": "0x1234...abcd",
-  "chain": "ethereum",
-  "supported_assets": ["USDC", "DAI"],
-  "min_settlement": "1000.00",
+  "protocol": "HP-SETTLE-v1",
+  "min_settlement_units": 1000,
+  "clearing_interval_ms": 100,
   "auth_scheme": "mTLS"
 }`}
             </pre>

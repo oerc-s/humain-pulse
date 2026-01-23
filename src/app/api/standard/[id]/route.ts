@@ -17,9 +17,10 @@ export async function GET(
     id: 'HP-STD-001',
     version: '1.0',
     primitives: ['MID', 'EI', 'M2M-SE', 'LCH', 'CSD'],
+    liability_primitives: ['MID', 'M2M-SE', 'LCH', 'CSD'],
     primitive_definitions: {
       MID: 'Machine Identity - present + cryptographically verifiable',
-      EI: 'Exposure Index - published + timestamped',
+      EI: 'Exposure Index - published + timestamped (excluded from MLI)',
       'M2M-SE': 'Machine-to-Machine Settlement Endpoint - reachable',
       LCH: 'Liability Chain Hash - Merkle root published',
       CSD: 'Control Surface Declaration - stop/disable endpoints published'
@@ -27,7 +28,8 @@ export async function GET(
     scoring: {
       MLI: {
         max: 100,
-        formula: '(MID + EI + M2M_SE + LCH + CSD) × 5',
+        formula: '(MID + M2M_SE + LCH + CSD) × 6.25',
+        note: 'EI excluded - exposure is not liability',
         purpose: 'Settlement-grade readiness. Higher MLI indicates better machine-to-machine liability clearing capability.'
       },
       MEI: {
@@ -44,8 +46,8 @@ export async function GET(
       4: { label: 'PUBLIC_VERIFIABLE', description: 'Full public endpoint with cryptographic verification' }
     },
     conformance_rules: {
-      CONFORMING: 'MLI ≥ 80 AND at least 4 primitives at level 4 (PUBLIC_VERIFIABLE)',
-      PARTIALLY_CONFORMING: 'MLI ≥ 50 AND at least 2 primitives at level 3+',
+      CONFORMING: 'MLI ≥ 80 AND at least 3 liability primitives at level 4 (PUBLIC_VERIFIABLE)',
+      PARTIALLY_CONFORMING: 'MLI ≥ 50 AND at least 2 liability primitives at level 3+',
       NON_CONFORMING: 'Does not meet CONFORMING or PARTIAL requirements'
     },
     mei_models: {

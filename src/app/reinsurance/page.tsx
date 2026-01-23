@@ -39,18 +39,18 @@ export default function ReinsurancePage() {
 
         {/* Hero */}
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium tracking-tighter text-white mb-6 uppercase leading-[0.9]">
-          Reinsurance Clearing Readiness
+          Reinsurance Clearing Capacity
           <br />
           <span className="text-emerald-500">Machine Risk</span> <span className="text-zinc-600 text-3xl md:text-4xl lg:text-5xl">(Live)</span>
         </h1>
         <h2 className="text-base md:text-lg text-zinc-400 font-mono uppercase tracking-widest mb-12 border-l-4 border-emerald-500 pl-6 max-w-3xl">
-          Public registry measuring whether reinsurance can settle autonomous AI/agent risk without human gating.
+          Public settlement states measuring whether reinsurance can settle autonomous AI/agent risk without human gating.
         </h2>
 
         {/* CTA Buttons */}
         <div className="flex flex-wrap gap-6 mb-16">
           <Link href="/reinsurance/registry" className="btn-primary">
-            View Registry
+            View Settlement Layer
           </Link>
           <Link href="/reinsurance/method" className="btn-secondary">
             Read Method

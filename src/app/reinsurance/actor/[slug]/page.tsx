@@ -11,6 +11,7 @@ import {
   LAST_PUBLISH_DATE
 } from '@/lib/reinsurance-data'
 import { ActorClient } from './ActorClient'
+import { checkClearance, CHOKE_POINTS } from '@/lib/choke-points'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -31,8 +32,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const scores = getActorScores(actor)
-  const title = `${actor.name} - ${actor.status} | Reinsurance Clearing Readiness`
-  const description = `${actor.name} clearing readiness record. MLI: ${scores.mli}/100, MEI: ${scores.mei}/200, EI_ADJ: ${scores.eiAdj}/250. Status: ${actor.status}. HP-STD-001 assessment.`
+  const title = `${actor.name} - ${actor.status} | Reinsurance Clearing Capacity`
+  const description = `${actor.name} clearing capacity record. MLI: ${scores.mli}/100, MEI: ${scores.mei}/200, EI_ADJ: ${scores.eiAdj}/250. Status: ${actor.status}. HP-STD-001 assessment.`
 
   return {
     title,
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       actor.name,
       `${actor.name} reinsurance`,
       `${actor.name} machine risk`,
-      'reinsurance clearing readiness',
+      'reinsurance clearing capacity',
       'machine risk settlement',
       'HP-STD-001',
       'ASI-STD-001',
@@ -71,6 +72,8 @@ export default async function ActorPage({ params }: Props) {
 
   const scores = getActorScores(actor)
   const gating = getObservedGating(actor.primitives)
+  const clearance = checkClearance(actor.slug, 'Capital', actor.primitives)
+  const chokePoint = CHOKE_POINTS['Capital']
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -114,7 +117,7 @@ export default async function ActorPage({ params }: Props) {
         <div className="flex flex-col lg:flex-row justify-between items-start mb-12 border-b border-white/10 pb-8 gap-8">
           <div>
             <Link href="/reinsurance/registry" className="text-zinc-500 hover:text-white font-mono text-[10px] uppercase mb-6 block tracking-widest">
-              ← Registry
+              ← Settlement Layer
             </Link>
             <div className="flex items-center gap-3 mb-4 flex-wrap">
               <span className="badge badge-layer">{actor.layer}</span>
@@ -142,6 +145,42 @@ export default async function ActorPage({ params }: Props) {
           </div>
         </div>
 
+        {/* CHOKE POINT STATUS */}
+        {clearance.status === 'BLOCKED' && chokePoint && (
+          <div className="mb-12 p-6 border border-red-500 bg-red-950/10">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <div className="text-[10px] font-mono text-red-400 uppercase tracking-widest mb-1">Choke Point Active</div>
+                <div className="text-white font-bold text-lg uppercase">{chokePoint.choke_point}</div>
+              </div>
+              <div className="px-4 py-2 bg-red-900 text-red-400 font-mono text-sm font-bold">
+                BLOCKED
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm font-mono">
+              <div>
+                <div className="text-[10px] text-zinc-500 uppercase mb-1">Missing Primitives</div>
+                <div className="flex gap-2">
+                  {clearance.blocking_primitives.map(p => (
+                    <span key={p} className="px-2 py-1 bg-red-900/50 text-red-400 text-xs">{p}</span>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="text-[10px] text-zinc-500 uppercase mb-1">Blocked Flow</div>
+                <div className="text-zinc-300">{chokePoint.blocked_flow}</div>
+              </div>
+              <div>
+                <div className="text-[10px] text-zinc-500 uppercase mb-1">Risk Transfer</div>
+                <div className="text-red-400">NON-TRANSFERABLE</div>
+              </div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-red-900/30 text-xs text-red-400 font-mono">
+              → {clearance.reason}
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Left Column */}
           <div className="lg:col-span-8 space-y-12">
@@ -153,14 +192,13 @@ export default async function ActorPage({ params }: Props) {
                 <div className="text-3xl font-mono text-white mb-1">
                   {scores.mli}<span className="text-zinc-600 text-lg">/100</span>
                 </div>
-                <div className="text-xs text-zinc-500">Clearing Readiness</div>
+                <div className="text-xs text-zinc-500">Clearing Capacity</div>
                 <div className="h-2 w-full bg-zinc-900 mt-3">
                   <div
                     className={`h-full ${scores.mli >= 75 ? 'bg-emerald-500' : scores.mli >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
                     style={{ width: `${scores.mli}%` }}
                   />
                 </div>
-                <div className="text-[9px] text-zinc-600 mt-2">Settlement readiness, not intent.</div>
               </div>
               <div className="bg-[#0b0d10] border border-white/10 p-6">
                 <div className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-2">MEI</div>
@@ -190,10 +228,18 @@ export default async function ActorPage({ params }: Props) {
               </div>
             </div>
 
+            {/* Settlement State — Reinsurance */}
+            <div className="p-4 border border-zinc-800 bg-zinc-900/30">
+              <h2 className="font-mono text-[10px] uppercase tracking-widest text-zinc-400 mb-3">Settlement State — Reinsurance</h2>
+              <p className="text-zinc-400 text-sm font-mono leading-relaxed">
+                This actor carries machine-risk exposure without machine-native settlement primitives. Exposure accrues daily until settlement endpoints are published and reachable.
+              </p>
+            </div>
+
             {/* Blocking Primitives */}
             <div>
               <h2 className="font-mono text-sm uppercase tracking-widest text-white mb-6 border-b border-white/10 pb-2">
-                Blocking Primitives
+                Settlement Primitives
               </h2>
               <div className="space-y-4">
                 {(Object.entries(actor.primitives) as [string, typeof actor.primitives.MID][]).map(([key, prim]) => (
@@ -281,7 +327,7 @@ export default async function ActorPage({ params }: Props) {
                         {n.id} · Trigger: {n.trigger}
                       </div>
                       <div className="text-[10px] font-mono text-zinc-500 mt-2">
-                        Settlement readiness can be updated by publishing verifiable endpoints.
+                        Clearing capacity can be updated by publishing verifiable endpoints.
                       </div>
                     </div>
                   ))}

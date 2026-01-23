@@ -26,7 +26,7 @@ export default function NoticesPage() {
     <div className="pt-32 pb-24 px-6 md:px-12 max-w-[1400px] mx-auto animate-in">
       <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-4">Public Notices</h1>
       <p className="text-zinc-400 font-mono text-sm mb-8">
-        Issued notices for reinsurance clearing readiness status.
+        Issued notices for reinsurance clearing capacity status.
       </p>
 
       {/* Filters */}
@@ -114,7 +114,7 @@ export default function NoticesPage() {
                   <span className="text-zinc-400">{notice.trigger}</span>
                 </div>
                 <div className="mt-3 pt-3 border-t border-white/5 text-[10px] font-mono text-zinc-500">
-                  Settlement readiness can be updated by publishing verifiable endpoints.
+                  Clearing capacity can be updated by publishing verifiable endpoints.
                 </div>
               </div>
             </div>
@@ -130,7 +130,7 @@ export default function NoticesPage() {
 
       {/* Footer */}
       <div className="mt-12 text-[10px] text-zinc-600 font-mono">
-        Notices generated based on clearing readiness status. Records updated daily (UTC).
+        Notices generated based on clearing capacity status. Records updated daily (UTC).
       </div>
     </div>
   )

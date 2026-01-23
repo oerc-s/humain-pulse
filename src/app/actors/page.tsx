@@ -8,7 +8,7 @@ import type { Layer, ConformanceStatus } from '@/types'
 type TabFilter = 'All' | Layer
 type SortBy = 'MEI' | 'MLI' | 'DEBT'
 
-export default function EntitiesPage() {
+export default function ActorsPage() {
   const [filterLayer, setFilterLayer] = useState<TabFilter>('All')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<SortBy>('MEI')
@@ -49,7 +49,7 @@ export default function EntitiesPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
         <div>
-          <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-6">Actor Index</h1>
+          <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-6">Actors</h1>
           <div className="flex gap-2 font-mono text-[10px] uppercase tracking-widest flex-wrap">
             {tabs.map(t => (
               <button
@@ -71,14 +71,14 @@ export default function EntitiesPage() {
               className="bg-transparent text-white ml-2 outline-none border-b border-zinc-800 py-1"
             >
               <option value="MEI">Top Exposure (MEI)</option>
-              <option value="MLI">Readiness (MLI)</option>
+              <option value="MLI">Clearing Capacity (MLI)</option>
               <option value="DEBT">Debt / Day</option>
             </select>
           </div>
           <div className="w-full md:w-64">
             <input
               type="text"
-              placeholder="SEARCH ENTITY..."
+              placeholder="SEARCH ACTOR..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-transparent border-b border-zinc-800 py-2 text-white font-mono text-sm focus:border-emerald-500 outline-none uppercase placeholder:text-zinc-700"
@@ -95,8 +95,8 @@ export default function EntitiesPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-emerald-500 font-mono text-[10px] uppercase tracking-widest mb-1">Specialized Registry</div>
-              <div className="text-white font-medium">Reinsurance Clearing Readiness</div>
+              <div className="text-emerald-500 font-mono text-[10px] uppercase tracking-widest mb-1">Specialized Settlement Layer</div>
+              <div className="text-white font-medium">Reinsurance Clearing Capacity</div>
               <div className="text-zinc-500 text-xs font-mono mt-1">MLI, MEI, EI_ADJ, DRIFT metrics · 6 reinsurers tracked</div>
             </div>
             <div className="text-emerald-500 group-hover:translate-x-1 transition-transform">→</div>
@@ -120,9 +120,9 @@ export default function EntitiesPage() {
           </thead>
           <tbody>
             {filteredActors.map(actor => (
-              <tr key={actor.id} onClick={() => window.location.href = `/entities/${actor.id}`}>
+              <tr key={actor.id} onClick={() => window.location.href = `/actors/${actor.id}`}>
                 <td>
-                  <Link href={`/entities/${actor.id}`} className="text-white font-bold text-sm hover:text-emerald-400 transition-colors">
+                  <Link href={`/actors/${actor.id}`} className="text-white font-bold text-sm hover:text-emerald-400 transition-colors">
                     {actor.name}
                   </Link>
                 </td>

@@ -74,9 +74,9 @@ export default function RegistryPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-8">
         <div>
-          <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">Reinsurance Registry</h1>
+          <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">Reinsurance Settlement Layer</h1>
           <p className="text-zinc-500 font-mono text-sm">
-            Machine-risk clearing readiness for capital / reinsurance layer.
+            Machine-risk clearing capacity for capital / reinsurance layer.
           </p>
         </div>
         <div className="flex gap-6 items-end w-full md:w-auto">
@@ -88,7 +88,7 @@ export default function RegistryPage() {
               className="bg-transparent text-white ml-2 outline-none border-b border-zinc-800 py-1"
             >
               <option value="EI_ADJ">Adjusted Exposure (EI_ADJ)</option>
-              <option value="MLI">Clearing Readiness (MLI)</option>
+              <option value="MLI">Clearing Capacity (MLI)</option>
               <option value="MEI">Exposure Pressure (MEI)</option>
               <option value="DRIFT">Drift (U/day)</option>
             </select>

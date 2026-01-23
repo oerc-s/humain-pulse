@@ -1,4 +1,4 @@
-// Reinsurance Clearing Readiness Data Model
+// Reinsurance Clearing Capacity Data Model
 // HP-STD-001 / ASI-STD-001
 
 export type PrimitiveState = 'PUBLISHED' | 'PARTIAL' | 'MISSING'

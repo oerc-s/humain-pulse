@@ -14,8 +14,9 @@ import type {
  * HP-STD-001 Scoring Engine
  *
  * Primitive Scores: 0=ABSENT, 1=CONCEPTUAL, 2=PROXY, 3=PARTIAL_PUBLIC, 4=PUBLIC_VERIFIABLE
- * MLI (Liability) = (MID + EI + M2M_SE + LCH + CSD) × 5  → Range 0-100
+ * MLI (Liability) = (MID + M2M_SE + LCH + CSD) × 6.25  → Range 0-100
  * MEI (Exposure) = Sector-specific formula → Range 0-200
+ * Note: EI is excluded from MLI (exposure is not liability)
  */
 
 // Get status label from score
@@ -41,14 +42,14 @@ export function getStatusLabel(status: PrimitiveStatus): string {
 }
 
 // Calculate MLI (Machine Liability Index) - Range 0-100
-// Formula: MLI = (MID + EI + M2M_SE + LCH + CSD) × 5
+// Formula: MLI = (MID + M2M_SE + LCH + CSD) × 6.25
+// Note: EI excluded - exposure is not liability
 export function calculateMLI(primitives: Primitives): number {
   const sum = primitives.MID.score +
-              primitives.EI.score +
               primitives.M2M_SE.score +
               primitives.LCH.score +
               primitives.CSD.score
-  return Math.min(100, sum * 5)
+  return Math.min(100, Math.round(sum * 6.25))
 }
 
 // Calculate MEI for Reinsurance - Range 0-200
@@ -114,13 +115,13 @@ export function calculateMEI(factors: MEIFactors, model: string): number {
 }
 
 // Determine conformance status
-// CONFORMING: MLI >= 80 AND at least 4 primitives at level 4
-// PARTIALLY_CONFORMING: MLI >= 50 AND at least 2 primitives at level 3+
+// CONFORMING: MLI >= 80 AND at least 3 liability primitives at level 4
+// PARTIALLY_CONFORMING: MLI >= 50 AND at least 2 liability primitives at level 3+
 // NON_CONFORMING: Otherwise
+// Note: EI excluded - exposure is not liability
 export function determineStatus(mli: number, primitives: Primitives): ConformanceStatus {
   const scores = [
     primitives.MID.score,
-    primitives.EI.score,
     primitives.M2M_SE.score,
     primitives.LCH.score,
     primitives.CSD.score
@@ -129,7 +130,7 @@ export function determineStatus(mli: number, primitives: Primitives): Conformanc
   const level4Count = scores.filter(s => s === 4).length
   const level3PlusCount = scores.filter(s => s >= 3).length
 
-  if (mli >= 80 && level4Count >= 4) {
+  if (mli >= 80 && level4Count >= 3) {
     return 'CONFORMING'
   }
 
@@ -140,14 +141,29 @@ export function determineStatus(mli: number, primitives: Primitives): Conformanc
   return 'NON_CONFORMING'
 }
 
-// Calculate daily debt units
-export function calculateDailyDebt(mei: number, status: ConformanceStatus): number {
+// Sector-specific alpha values for debt accrual
+// α determines systemic weight of exposure
+export const SECTOR_ALPHA: Record<string, number> = {
+  'Capital': 1.5,      // Reinsurance: systemic risk layer
+  'Compute': 1.2,      // Cloud: infrastructure dependency
+  'Intelligence': 1.0, // AI Labs: model risk
+  'Actuation': 1.3     // Robotics: physical risk
+}
+
+// Calculate daily debt units with sector alpha
+// Formula: DEBT = MEI × α(sector) × β(status)
+// Where β = 0.1 for PARTIAL, 0.15 for NON_CONFORMING
+export function calculateDailyDebt(mei: number, status: ConformanceStatus, layer?: string): number {
   if (status === 'CONFORMING') return 0
-  // Base debt scales with MEI
-  const baseDebt = Math.floor(mei / 10)
-  // Multiplier for non-conforming
-  const multiplier = status === 'NON_CONFORMING' ? 1.5 : 1.0
-  return Math.round(baseDebt * multiplier)
+  const alpha = layer ? (SECTOR_ALPHA[layer] || 1.0) : 1.0
+  const beta = status === 'NON_CONFORMING' ? 0.15 : 0.10
+  return Math.round(mei * alpha * beta)
+}
+
+// Get debt formula string for display
+export function getDebtFormula(layer: string): string {
+  const alpha = SECTOR_ALPHA[layer] || 1.0
+  return `DEBT = MEI × ${alpha} × β`
 }
 
 // Get status color
@@ -166,11 +182,11 @@ export function getPrimitiveColor(score: PrimitiveScore): string {
   return 'text-red-500'
 }
 
-// Count primitives at specific levels
+// Count liability primitives at specific levels
+// Note: EI excluded - exposure is not liability
 export function countPrimitivesAtLevel(primitives: Primitives, minLevel: PrimitiveScore): number {
   const scores = [
     primitives.MID.score,
-    primitives.EI.score,
     primitives.M2M_SE.score,
     primitives.LCH.score,
     primitives.CSD.score

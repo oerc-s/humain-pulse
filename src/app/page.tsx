@@ -1,127 +1,93 @@
 import Link from 'next/link'
-import { getStats, getAllNotices, ACTORS } from '@/lib/data'
+import { getStats, ACTORS } from '@/lib/data'
 
 export default function HomePage() {
   const stats = getStats()
-  const recentNotices = getAllNotices().slice(0, 4)
-
-  // Activity feed
-  const feed = [
-    { type: 'NOTICE', text: `${stats.nonConforming} actors unsettled — exposure accruing`, time: 'Today' },
-    { type: 'DEBT', text: `${stats.totalDebtToday} total exposure units accruing daily`, time: 'Active' },
-    { type: 'SCORE', text: `Average MEI across registry: ${stats.avgMEI}/200`, time: 'Current' },
-    { type: 'STATUS', text: `${stats.partial} actors partially settled`, time: 'Active' },
-  ]
 
   return (
     <div className="pt-32 px-6 md:px-12 animate-in">
       <div className="max-w-[1800px] mx-auto min-h-[80vh] flex flex-col justify-start">
 
-        {/* Live Counters */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-16 border-b border-white/10 pb-8">
-          <div className="border-l border-white/10 pl-4">
-            <div className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-1">Total Actors</div>
-            <div className="text-2xl text-white font-mono">{stats.total}</div>
-          </div>
-          <div className="border-l border-white/10 pl-4">
-            <div className="text-xs font-mono text-red-500 uppercase tracking-widest mb-1">Unsettled</div>
-            <div className="text-2xl text-red-500 font-mono">{stats.nonConforming}</div>
-          </div>
-          <div className="border-l border-white/10 pl-4">
-            <div className="text-xs font-mono text-yellow-500 uppercase tracking-widest mb-1">Partially Settled</div>
-            <div className="text-2xl text-yellow-500 font-mono">{stats.partial}</div>
-          </div>
-          <div className="border-l border-white/10 pl-4">
-            <div className="text-xs font-mono text-emerald-500 uppercase tracking-widest mb-1">Settled</div>
-            <div className="text-2xl text-white font-mono">{stats.conforming}</div>
-          </div>
-          <div className="border-l border-white/10 pl-4">
-            <div className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-1">Debt Today</div>
-            <div className="text-2xl text-white font-mono">{stats.totalDebtToday}</div>
-          </div>
-        </div>
-
-        {/* Hero */}
-        <h1 className="text-6xl md:text-8xl font-medium tracking-tighter text-white mb-6 uppercase leading-[0.85]">
-          Humain Pulse
+        {/* HERO */}
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tighter text-white mb-8 uppercase leading-[0.9] max-w-4xl">
+          Machine Exposure Exists.<br />
+          <span className="text-emerald-500">Clearing Changes State.</span>
         </h1>
-        <h2 className="text-lg md:text-xl text-zinc-400 font-mono uppercase tracking-widest mb-12 border-l-4 border-emerald-500 pl-6 max-w-3xl">
-          Machine-native liability registry & exposure clearing readiness.
-        </h2>
+        <p className="text-lg md:text-xl text-zinc-400 font-mono uppercase tracking-widest mb-16 max-w-2xl">
+          Humain Pulse operates machine-native exposure clearing.
+        </p>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-wrap gap-6 mb-24">
-          <Link href="/entities" className="btn-primary">
-            Browse Actors
-          </Link>
-          <Link href="/standard" className="btn-secondary">
-            View Primitives
-          </Link>
-          <Link href="/conformance" className="btn-secondary">
-            Conformance
-          </Link>
-        </div>
-
-        {/* Activity Feed */}
-        <div className="border-t border-white/10 pt-8 mb-16">
-          <h3 className="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-6">Today&apos;s Activity</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {feed.map((item, i) => (
-              <div key={i} className="border-l border-zinc-800 pl-4">
-                <div className="flex justify-between mb-2">
-                  <span className={`text-[10px] font-mono uppercase px-1 ${
-                    item.type === 'NOTICE' ? 'bg-red-900 text-red-400' :
-                    item.type === 'DEBT' ? 'bg-yellow-900 text-yellow-400' :
-                    'bg-zinc-800 text-zinc-400'
-                  }`}>{item.type}</span>
-                  <span className="text-[10px] font-mono text-zinc-600">{item.time}</span>
-                </div>
-                <p className="text-xs text-zinc-300 font-mono leading-relaxed">{item.text}</p>
-              </div>
-            ))}
+        {/* Live Clearing Surface */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-16 border border-white/10 p-6 bg-zinc-900/20">
+          <div>
+            <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Actors</div>
+            <div className="text-3xl text-white font-mono">{stats.total}</div>
+          </div>
+          <div>
+            <div className="text-[10px] font-mono text-red-500 uppercase tracking-widest mb-1">Unsettled</div>
+            <div className="text-3xl text-red-500 font-mono">{stats.nonConforming}</div>
+          </div>
+          <div>
+            <div className="text-[10px] font-mono text-yellow-500 uppercase tracking-widest mb-1">Partial</div>
+            <div className="text-3xl text-yellow-500 font-mono">{stats.partial}</div>
+          </div>
+          <div>
+            <div className="text-[10px] font-mono text-emerald-500 uppercase tracking-widest mb-1">Settled</div>
+            <div className="text-3xl text-emerald-500 font-mono">{stats.conforming}</div>
+          </div>
+          <div>
+            <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Exposure/Day</div>
+            <div className="text-3xl text-white font-mono">{stats.totalDebtToday} <span className="text-sm text-zinc-500">U</span></div>
           </div>
         </div>
 
-        {/* Top Exposure Actors */}
+        {/* CTA */}
+        <div className="flex flex-wrap gap-6 mb-24">
+          <Link href="/actors" className="btn-primary">
+            Actors
+          </Link>
+          <Link href="/clearing" className="btn-secondary">
+            Clearing Rules
+          </Link>
+          <Link href="/notices" className="btn-secondary">
+            Notices
+          </Link>
+        </div>
+
+        {/* Highest Exposure */}
         <div className="border-t border-white/10 pt-8">
-          <h3 className="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-6">Highest Exposure</h3>
+          <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mb-6">Highest Exposure</div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {ACTORS.sort((a, b) => b.scores.MEI - a.scores.MEI).slice(0, 4).map((actor) => (
               <Link
                 key={actor.id}
-                href={`/entities/${actor.id}`}
-                className="card hover:border-white/30 transition-colors group"
+                href={`/actors/${actor.id}`}
+                className="border border-white/10 bg-zinc-900/30 p-4 hover:border-white/30 transition-colors group"
               >
-                <div className="flex justify-between items-start mb-4">
-                  <span className="badge badge-layer">{actor.layer}</span>
-                  <span className={`badge ${
-                    actor.status === 'CONFORMING' ? 'badge-conforming' :
-                    actor.status === 'PARTIALLY_CONFORMING' ? 'badge-partial' :
-                    'badge-non-conforming'
+                <div className="flex justify-between items-start mb-3">
+                  <span className="text-[10px] font-mono text-zinc-500 uppercase">{actor.sector}</span>
+                  <span className={`text-[10px] font-mono uppercase px-2 py-0.5 ${
+                    actor.status === 'CONFORMING' ? 'bg-emerald-900/50 text-emerald-400' :
+                    actor.status === 'PARTIALLY_CONFORMING' ? 'bg-yellow-900/50 text-yellow-400' :
+                    'bg-red-900/50 text-red-400'
                   }`}>
                     {actor.status === 'NON_CONFORMING' ? 'UNSETTLED' :
                      actor.status === 'PARTIALLY_CONFORMING' ? 'PARTIAL' : 'SETTLED'}
                   </span>
                 </div>
-                <h4 className="text-white font-bold text-lg mb-2 group-hover:text-emerald-400 transition-colors">
+                <h4 className="text-white font-bold text-lg mb-3 group-hover:text-emerald-400 transition-colors">
                   {actor.name}
                 </h4>
-                <div className="flex justify-between font-mono text-sm">
-                  <span className="text-zinc-500">MEI</span>
-                  <span className={actor.scores.MEI > 150 ? 'text-red-500' : 'text-yellow-500'}>
-                    {actor.scores.MEI}/200
-                  </span>
-                </div>
-                <div className="flex justify-between font-mono text-sm mt-1">
-                  <span className="text-zinc-500">MLI</span>
-                  <span className="text-zinc-300">{actor.scores.MLI}/100</span>
-                </div>
-                {actor.debt.active && (
-                  <div className="mt-3 pt-3 border-t border-white/10 flex justify-between font-mono text-xs">
-                    <span className="text-zinc-600">Debt/Day</span>
-                    <span className="text-red-400">{actor.debt.units_today} U</span>
+                <div className="grid grid-cols-2 gap-2 font-mono text-sm">
+                  <div>
+                    <div className="text-[10px] text-zinc-600">MEI</div>
+                    <div className={actor.scores.MEI > 150 ? 'text-red-500' : 'text-zinc-300'}>{actor.scores.MEI}</div>
                   </div>
-                )}
+                  <div>
+                    <div className="text-[10px] text-zinc-600">MLI</div>
+                    <div className="text-zinc-300">{actor.scores.MLI}</div>
+                  </div>
+                </div>
               </Link>
             ))}
           </div>

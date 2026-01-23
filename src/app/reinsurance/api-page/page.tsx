@@ -70,7 +70,7 @@ export default function APIPage() {
     <div className="pt-32 pb-24 px-6 md:px-12 max-w-[1200px] mx-auto animate-in">
       <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-4">API</h1>
       <p className="text-zinc-400 font-mono text-sm mb-4">
-        Read-only JSON endpoints for reinsurance clearing readiness data.
+        Read-only JSON endpoints for reinsurance clearing capacity data.
       </p>
       <p className="text-zinc-500 font-mono text-xs mb-12">
         Base URL: <code className="text-emerald-500">https://humain-pulse.com</code>

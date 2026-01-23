@@ -20,48 +20,46 @@ const BASE_URL = 'https://humain-pulse.com'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Humain Pulse — Machine-Native Liability Registry (HP-STD-001)',
+    default: 'Humain Pulse — Machine-Native Clearing Operator',
     template: '%s | Humain Pulse'
   },
-  description: 'Machine-native liability registry and exposure clearing readiness. Tracking conformance across Capital, Compute, Intelligence, and Actuation layers under HP-STD-001 / ASI-STD-001.',
+  description: 'Machine exposure exists. Clearing changes state. Humain Pulse operates machine-native exposure clearing.',
   keywords: [
-    'machine liability registry',
-    'exposure clearing readiness',
-    'autonomous AI risk settlement',
-    'AI-to-AI settlement',
-    'exposure index endpoint',
-    'liability chain hash',
+    'machine exposure clearing',
+    'clearing operator',
+    'settlement layer',
+    'exposure normalization',
+    'machine-native clearing',
     'HP-STD-001',
     'ASI-STD-001',
-    'machine-to-machine settlement',
-    'reinsurance clearing',
-    'machine identity',
-    'settlement endpoint'
+    'exposure accrual',
+    'state transition',
+    'clearing execution'
   ],
-  authors: [{ name: 'Humain Protocol' }],
-  creator: 'Humain Protocol',
-  publisher: 'Humain Protocol',
+  authors: [{ name: 'Humain Pulse' }],
+  creator: 'Humain Pulse',
+  publisher: 'Humain Pulse',
   metadataBase: new URL(BASE_URL),
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: BASE_URL,
     siteName: 'Humain Pulse',
-    title: 'Humain Pulse — Machine-Native Liability Registry (HP-STD-001)',
-    description: 'Machine-native liability registry and exposure clearing readiness across Capital, Compute, Intelligence, and Actuation.',
+    title: 'Humain Pulse — Machine-Native Clearing Operator',
+    description: 'Machine exposure exists. Clearing changes state.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Humain Pulse — Machine-Native Liability Registry'
+        alt: 'Humain Pulse — Machine-Native Clearing Operator'
       }
     ]
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Humain Pulse — Machine-Native Liability Registry',
-    description: 'Machine-native liability registry and exposure clearing readiness across Capital, Compute, Intelligence, and Actuation.',
+    title: 'Humain Pulse — Machine-Native Clearing Operator',
+    description: 'Machine exposure exists. Clearing changes state.',
     images: ['/og-image.png']
   },
   robots: {
@@ -79,29 +77,11 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Dataset',
-  name: 'Humain Pulse Machine-Native Liability Registry',
-  description: 'Machine-native liability registry and exposure clearing readiness. Tracking conformance across Capital, Compute, Intelligence, and Actuation layers under HP-STD-001 / ASI-STD-001.',
+  '@type': 'Organization',
+  name: 'Humain Pulse',
+  description: 'Machine-native clearing operator. Exposure normalization engine.',
   url: BASE_URL,
-  license: 'https://creativecommons.org/publicdomain/zero/1.0/',
-  creator: {
-    '@type': 'Organization',
-    name: 'Humain Protocol'
-  },
-  distribution: {
-    '@type': 'DataDownload',
-    encodingFormat: 'application/json',
-    contentUrl: `${BASE_URL}/api/registry`
-  },
-  temporalCoverage: '2026-01-22/..',
-  keywords: [
-    'machine liability',
-    'exposure clearing',
-    'HP-STD-001',
-    'ASI-STD-001',
-    'autonomous settlement',
-    'reinsurance'
-  ]
+  sameAs: [],
 }
 
 export default function RootLayout({

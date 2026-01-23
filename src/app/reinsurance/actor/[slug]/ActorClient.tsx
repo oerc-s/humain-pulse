@@ -24,7 +24,7 @@ export function ActorClient({ actor, scores }: ActorClientProps) {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${actor.slug}-hp-std-001.json`
+    a.download = `${actor.slug}-hp-sl-001.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
