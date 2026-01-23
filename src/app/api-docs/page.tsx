@@ -93,26 +93,6 @@ export default function ApiDocsPage() {
   "total": 35
 }`
     },
-    {
-      method: 'GET',
-      path: '/api/clearing/invoices',
-      desc: 'AP-ready invoice objects',
-      response: `{
-  "invoices": [
-    {
-      "ref": "HP-INV-MUNICH-RE-20260123-001",
-      "actor_id": "munich-re",
-      "actor_name": "Munich Re",
-      "line_item": "Status Reconciliation",
-      "amount": 14800,
-      "cycle_id": "HP-STD-001 v1.10",
-      "due_date": "2026-02-22",
-      "status": "pending"
-    }
-  ],
-  "total": 21
-}`
-    }
   ]
 
   return (

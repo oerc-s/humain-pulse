@@ -27,7 +27,7 @@ export default function HomePage() {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-emerald-500">→</span>
-            <span>Invoice object: <span className="text-white">Status Reconciliation (AP-payable)</span></span>
+            <span>Settlement: <span className="text-white">Publish → Propagate → Repeat</span></span>
           </div>
         </div>
 
@@ -65,9 +65,6 @@ export default function HomePage() {
           </Link>
           <Link href="/notices" className="btn-secondary">
             View Notices
-          </Link>
-          <Link href="/invoices" className="btn-secondary">
-            View Invoices
           </Link>
         </div>
 

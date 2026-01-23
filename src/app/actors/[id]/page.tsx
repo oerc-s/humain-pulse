@@ -174,16 +174,10 @@ export default async function ActorPage({ params }: Props) {
         {/* Actions */}
         <div className="flex gap-4">
           <Link
-            href={`/invoices?actor=${actor.id}`}
+            href={`/notices?actor=${actor.id}`}
             className="btn-primary"
           >
-            Generate Invoice
-          </Link>
-          <Link
-            href={`/notices?actor=${actor.id}`}
-            className="btn-secondary"
-          >
-            Open Notice
+            View Notices
           </Link>
         </div>
 
