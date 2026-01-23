@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import { getAllNotices } from '@/lib/data'
 
 export const metadata: Metadata = {
-  title: 'Clearing Notices',
-  description: 'Public clearing events. State changes and exposure accrual notices.',
-  keywords: ['clearing notices', 'exposure events', 'state changes', 'clearing operator'],
+  title: 'Exposure Notices',
+  description: 'Public exposure events. State changes and accrual notices.',
+  keywords: ['exposure notices', 'exposure events', 'state changes', 'clearing operator'],
 }
 
 export default function NoticesPage() {
@@ -13,10 +13,10 @@ export default function NoticesPage() {
   return (
     <div className="pt-32 pb-24 px-6 md:px-12 max-w-5xl mx-auto animate-in">
       <h1 className="text-4xl text-white font-medium uppercase mb-4">
-        Clearing Notices
+        Exposure Notices
       </h1>
       <p className="text-zinc-400 font-mono text-sm mb-12">
-        Public clearing events. State unchanged until clearing active.
+        Public exposure events. State unchanged until settlement.
       </p>
 
       <div className="space-y-4">

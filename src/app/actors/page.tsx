@@ -55,7 +55,7 @@ export default function ActorsPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
         <div>
-          <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-6">Actors</h1>
+          <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-6">Entities</h1>
           <div className="flex gap-2 font-mono text-[10px] uppercase tracking-widest flex-wrap">
             {tabs.map(t => (
               <button

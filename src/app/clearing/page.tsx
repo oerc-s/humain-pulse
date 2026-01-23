@@ -1,16 +1,16 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Clearing Rules',
-  description: 'Deterministic clearing logic. MLI and MEI formulas. State transition rules. No exceptions.',
-  keywords: ['clearing rules', 'MLI formula', 'MEI formula', 'state transition', 'clearing primitives'],
+  title: 'Settlement Rules',
+  description: 'Deterministic settlement logic. MLI and MEI formulas. State transition rules. No exceptions.',
+  keywords: ['settlement rules', 'MLI formula', 'MEI formula', 'state transition', 'settlement primitives'],
 }
 
 export default function ClearingPage() {
   return (
     <div className="pt-32 pb-24 px-6 md:px-12 max-w-5xl mx-auto animate-in">
       <h1 className="text-4xl text-white font-medium uppercase mb-4">
-        Clearing Rules
+        Settlement Rules
       </h1>
       <p className="text-zinc-400 font-mono text-sm mb-16">
         Deterministic state logic. No exceptions.

@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const navItems = [
-  { href: '/actors', label: 'Actors' },
-  { href: '/clearing', label: 'Clearing' },
+  { href: '/actors', label: 'Entities' },
+  { href: '/clearing', label: 'Settlement' },
   { href: '/notices', label: 'Notices' },
   { href: '/api-docs', label: 'API' },
 ]
@@ -43,7 +43,7 @@ export function Navigation() {
           href="/actors"
           className="border border-white/20 bg-white/5 text-white px-4 py-2 font-mono text-[10px] uppercase tracking-widest hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all active:scale-95"
         >
-          View Actors
+          View Entities
         </Link>
       </div>
     </nav>

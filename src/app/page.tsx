@@ -10,17 +10,17 @@ export default function HomePage() {
 
         {/* HERO */}
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tighter text-white mb-8 uppercase leading-[0.9] max-w-4xl">
-          Machine Exposure Exists.<br />
-          <span className="text-emerald-500">Clearing Changes State.</span>
+          Exposure Accrues.<br />
+          <span className="text-emerald-500">Settlement Closes It.</span>
         </h1>
         <p className="text-lg md:text-xl text-zinc-400 font-mono uppercase tracking-widest mb-16 max-w-2xl">
-          Humain Pulse operates machine-native exposure clearing.
+          Machine-native clearing operator. Status is public. Reconciliation is billable.
         </p>
 
         {/* Live Clearing Surface */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-16 border border-white/10 p-6 bg-zinc-900/20">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4 border border-white/10 p-6 bg-zinc-900/20">
           <div>
-            <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Actors</div>
+            <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Entities</div>
             <div className="text-3xl text-white font-mono">{stats.total}</div>
           </div>
           <div>
@@ -36,21 +36,24 @@ export default function HomePage() {
             <div className="text-3xl text-emerald-500 font-mono">{stats.conforming}</div>
           </div>
           <div>
-            <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Exposure/Day</div>
-            <div className="text-3xl text-white font-mono">{stats.totalDebtToday} <span className="text-sm text-zinc-500">U</span></div>
+            <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Accrual Rate</div>
+            <div className="text-3xl text-white font-mono">{stats.totalDebtToday} <span className="text-sm text-zinc-500">U/day</span></div>
           </div>
+        </div>
+        <div className="text-[10px] font-mono text-zinc-600 mb-16">
+          Accrual remains active until settlement primitives are published.
         </div>
 
         {/* CTA */}
         <div className="flex flex-wrap gap-6 mb-24">
           <Link href="/actors" className="btn-primary">
-            Actors
+            Entities
           </Link>
           <Link href="/clearing" className="btn-secondary">
-            Clearing Rules
+            Settlement Rules
           </Link>
           <Link href="/notices" className="btn-secondary">
-            Notices
+            Exposure Notices
           </Link>
         </div>
 
