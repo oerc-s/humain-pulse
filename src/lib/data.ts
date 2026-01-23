@@ -52,7 +52,7 @@ function generateNotices(id: string, name: string, status: ConformanceStatus, ml
   const settlementStatus = toSettlementStatus(status)
   const cashState = deriveCashState(settlementStatus)
   const deltaMLI = 0 // No change in 24h by default
-  const deltaMEI = status === 'CONFORMING' ? 0 : Math.round(mei * 0.02) // 2% daily accrual
+  const deltaMEI = Math.round(mei * 0.02) // 2% daily accrual for non-settled
 
   const notices: Notice[] = [{
     id: `MED-${id.toUpperCase()}-2026-001`,
