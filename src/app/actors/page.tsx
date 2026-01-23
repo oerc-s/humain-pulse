@@ -1,46 +1,52 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
-import { ACTORS } from '@/lib/data'
-import type { Layer, ConformanceStatus } from '@/types'
+import type { Layer } from '@/types'
+import type { ClearingActorWithExposure } from '@/lib/clearing/types'
 
 type TabFilter = 'All' | Layer
-type SortBy = 'MEI' | 'MLI' | 'DEBT'
+type SortBy = 'MEI' | 'MLI'
 
 export default function ActorsPage() {
+  const [actors, setActors] = useState<ClearingActorWithExposure[]>([])
   const [filterLayer, setFilterLayer] = useState<TabFilter>('All')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<SortBy>('MEI')
 
+  useEffect(() => {
+    fetch('/api/clearing/actors')
+      .then(r => r.json())
+      .then(data => setActors(data.actors || []))
+  }, [])
+
   const filteredActors = useMemo(() => {
-    let actors = [...ACTORS]
+    let list = [...actors]
 
     // Filter by layer
     if (filterLayer !== 'All') {
-      actors = actors.filter(a => a.layer === filterLayer)
+      list = list.filter(a => a.actor.layer === filterLayer)
     }
 
     // Filter by search
     if (searchTerm.trim()) {
       const query = searchTerm.toLowerCase()
-      actors = actors.filter(a =>
-        a.name.toLowerCase().includes(query) ||
-        a.sector.toLowerCase().includes(query) ||
-        a.id.toLowerCase().includes(query)
+      list = list.filter(a =>
+        a.actor.name.toLowerCase().includes(query) ||
+        a.actor.sector.toLowerCase().includes(query) ||
+        a.actor.actor_id.toLowerCase().includes(query)
       )
     }
 
     // Sort
-    actors.sort((a, b) => {
-      if (sortBy === 'MEI') return b.scores.MEI - a.scores.MEI
-      if (sortBy === 'MLI') return b.scores.MLI - a.scores.MLI
-      if (sortBy === 'DEBT') return b.debt.units_today - a.debt.units_today
+    list.sort((a, b) => {
+      if (sortBy === 'MEI') return b.exposure.MEI - a.exposure.MEI
+      if (sortBy === 'MLI') return b.exposure.MLI - a.exposure.MLI
       return 0
     })
 
-    return actors
-  }, [filterLayer, searchTerm, sortBy])
+    return list
+  }, [actors, filterLayer, searchTerm, sortBy])
 
   const tabs: TabFilter[] = ['All', 'Capital', 'Compute', 'Intelligence', 'Actuation']
 
@@ -72,7 +78,6 @@ export default function ActorsPage() {
             >
               <option value="MEI">Top Exposure (MEI)</option>
               <option value="MLI">Clearing Capacity (MLI)</option>
-              <option value="DEBT">Debt / Day</option>
             </select>
           </div>
           <div className="w-full md:w-64">
@@ -112,42 +117,33 @@ export default function ActorsPage() {
               <th>Actor</th>
               <th>Layer</th>
               <th className="text-center">Status</th>
-              <th className="text-right">MLI (0-100)</th>
-              <th className="text-right">MEI (0-200)</th>
-              <th className="text-right">Debt / Day</th>
-              <th className="text-right">Last Update</th>
+              <th className="text-right">MLI</th>
+              <th className="text-right">MEI</th>
             </tr>
           </thead>
           <tbody>
-            {filteredActors.map(actor => (
-              <tr key={actor.id} onClick={() => window.location.href = `/actors/${actor.id}`}>
+            {filteredActors.map(({ actor, exposure }) => (
+              <tr key={actor.actor_id}>
                 <td>
-                  <Link href={`/actors/${actor.id}`} className="text-white font-bold text-sm hover:text-emerald-400 transition-colors">
+                  <span className="text-white font-bold text-sm">
                     {actor.name}
-                  </Link>
+                  </span>
                 </td>
                 <td className="text-zinc-400 text-xs font-mono uppercase">{actor.layer}</td>
                 <td className="text-center">
                   <span className={`badge ${
-                    actor.status === 'CONFORMING' ? 'badge-conforming' :
-                    actor.status === 'PARTIALLY_CONFORMING' ? 'badge-partial' :
+                    actor.status === 'SETTLED' ? 'badge-conforming' :
+                    actor.status === 'PARTIAL' ? 'badge-partial' :
                     'badge-non-conforming'
                   }`}>
-                    {actor.status === 'NON_CONFORMING' ? 'UNSETTLED' :
-                     actor.status === 'PARTIALLY_CONFORMING' ? 'PARTIAL' : 'SETTLED'}
+                    {actor.status}
                   </span>
                 </td>
-                <td className="text-right font-mono text-zinc-300">{actor.scores.MLI}</td>
+                <td className="text-right font-mono text-zinc-300">{exposure.MLI}</td>
                 <td className="text-right font-mono">
-                  <span className={actor.scores.MEI > 150 ? 'text-red-500' : actor.scores.MEI > 100 ? 'text-yellow-500' : 'text-zinc-300'}>
-                    {actor.scores.MEI}
+                  <span className={exposure.MEI > 1000 ? 'text-red-500' : exposure.MEI > 500 ? 'text-yellow-500' : 'text-zinc-300'}>
+                    {Math.round(exposure.MEI)}
                   </span>
-                </td>
-                <td className="text-right font-mono text-red-400">
-                  {actor.debt.units_today > 0 ? `${actor.debt.units_today} U` : '-'}
-                </td>
-                <td className="text-right font-mono text-[10px] text-zinc-600">
-                  {actor.last_review_date}
                 </td>
               </tr>
             ))}
@@ -163,7 +159,7 @@ export default function ActorsPage() {
 
       {/* Summary */}
       <div className="mt-8 text-xs text-zinc-600 font-mono">
-        Showing {filteredActors.length} of {ACTORS.length} actors · Sorted by {sortBy} (descending)
+        Showing {filteredActors.length} of {actors.length} actors · Sorted by {sortBy} (descending)
       </div>
     </div>
   )
