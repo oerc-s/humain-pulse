@@ -14,7 +14,7 @@ export default function HomePage() {
           <span className="text-emerald-500">Settlement Closes It.</span>
         </h1>
         <p className="text-lg md:text-xl text-zinc-400 font-mono uppercase tracking-widest mb-16 max-w-2xl">
-          Machine-native clearing operator. Status is public. Reconciliation is billable.
+          Machine-native clearing operator.
         </p>
 
         {/* Live Clearing Surface */}
