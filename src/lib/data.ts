@@ -25,26 +25,28 @@ function createPrimitives(mid: PrimitiveScore, ei: PrimitiveScore, m2m: Primitiv
   }
 }
 
-// Generate notices for non-conforming actors
+// Generate MEDs (Machine Exposure Documents) for unsettled actors
 function generateNotices(id: string, name: string, status: ConformanceStatus, mli: number): Notice[] {
   if (status === 'CONFORMING') return []
 
+  const statusLabel = status === 'NON_CONFORMING' ? 'UNSETTLED' : 'PARTIAL'
+
   const notices: Notice[] = [{
-    id: `NCR-${id.toUpperCase()}-2026-001`,
+    id: `MED-${id.toUpperCase()}-2026-001`,
     date: REVIEW_DATE,
     type: 'NON_CONFORMANCE',
-    title: `HP-STD-001 Status: ${status.replace('_', ' ')}`,
-    summary: `${name} assessed as ${status.replace('_', ' ')}. MLI: ${mli}/100. Settlement-grade primitives incomplete. Exposure debt accrual active.`,
+    title: `Exposure State: ${statusLabel}`,
+    summary: `${name} clearing state: ${statusLabel}. MLI: ${mli}/100. Settlement primitives incomplete. Exposure accrues.`,
     severity: status === 'NON_CONFORMING' ? 'HIGH' : 'MODERATE'
   }]
 
   if (mli < 20) {
     notices.push({
-      id: `EDA-${id.toUpperCase()}-2026-001`,
+      id: `MED-${id.toUpperCase()}-2026-002`,
       date: REVIEW_DATE,
       type: 'DEBT_ACCRUAL',
-      title: 'Critical Exposure Debt Warning',
-      summary: `MLI below threshold. Daily debt accrual multiplier active. Immediate remediation required.`,
+      title: 'Critical Exposure Accrual',
+      summary: `MLI below 20. Accrual multiplier active. Settlement blocked.`,
       severity: 'CRITICAL'
     })
   }

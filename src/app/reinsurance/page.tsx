@@ -57,9 +57,9 @@ export default function ReinsurancePage() {
           </Link>
         </div>
 
-        {/* Standards Basis */}
+        {/* Spec Basis */}
         <div className="font-mono text-[10px] text-zinc-600 uppercase tracking-widest mb-16">
-          Standards basis: <span className="text-zinc-400">HP-STD-001</span> / <span className="text-zinc-400">ASI-STD-001</span>
+          Spec: <span className="text-zinc-400">HP-001</span>
         </div>
 
         {/* Status Legend */}

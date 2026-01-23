@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       status,
       'machine exposure',
       'clearing state',
-      'HP-STD-001'
+      'HP-001'
     ],
     openGraph: {
       title,
