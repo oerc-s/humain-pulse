@@ -39,7 +39,8 @@ export default function EntitiesPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-6">
         <div>
-          <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-4">Entity Index</h1>
+          <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">Actors</h1>
+          <p className="text-zinc-500 font-mono text-xs mb-4">All monitored entities. Click to view state block.</p>
           <div className="flex gap-2 font-mono text-[10px] uppercase tracking-widest flex-wrap">
             {tabs.map(t => (
               <button
