@@ -4,11 +4,23 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { ACTORS } from '@/lib/data'
 import type { Layer } from '@/types'
-import type { Metadata } from 'next'
 
 type TabFilter = 'All' | Layer
 
-export default function LeagueTablePage() {
+function getStatusLabel(status: string): string {
+  switch (status) {
+    case 'SETTLED': return 'clearing active'
+    case 'PARTIAL': return 'settlement incomplete'
+    case 'OBSERVED': return 'loss vector active'
+    default: return 'losses accumulating'
+  }
+}
+
+function getPrimitiveCheck(score: number): string {
+  return score >= 3 ? '✓' : '✗'
+}
+
+export default function EntitiesPage() {
   const [filterLayer, setFilterLayer] = useState<TabFilter>('All')
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -27,9 +39,7 @@ export default function LeagueTablePage() {
       )
     }
 
-    // Sort by MEI descending (highest exposure first)
     list.sort((a, b) => b.scores.MEI - a.scores.MEI)
-
     return list
   }, [filterLayer, searchTerm])
 
@@ -37,11 +47,10 @@ export default function LeagueTablePage() {
 
   return (
     <div className="pt-32 pb-20 px-6 md:px-12 min-h-screen max-w-[1800px] mx-auto animate-in">
-      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-6">
         <div>
-          <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">League Table</h1>
-          <p className="text-zinc-500 font-mono text-xs mb-4">Exposure ranking. Updated daily.</p>
+          <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">Entities</h1>
+          <p className="text-zinc-500 font-mono text-xs mb-4">Exposure ranking by MEI. Losses accumulating until settlement.</p>
           <div className="flex gap-2 font-mono text-[10px] uppercase tracking-widest flex-wrap">
             {tabs.map(t => (
               <button
@@ -65,43 +74,41 @@ export default function LeagueTablePage() {
         </div>
       </div>
 
-      {/* League Table Header */}
-      <div className="hidden md:grid grid-cols-12 gap-4 py-3 border-b border-white/10 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">
-        <div className="col-span-1 text-center">Rank</div>
-        <div className="col-span-3">Actor</div>
+      {/* Table Header */}
+      <div className="hidden lg:grid grid-cols-12 gap-2 py-3 border-b border-white/10 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">
+        <div className="col-span-2">Actor</div>
+        <div className="col-span-1">Sector</div>
         <div className="col-span-1 text-center">Status</div>
         <div className="col-span-1 text-right">MEI</div>
-        <div className="col-span-1 text-right">dMEI_24h</div>
         <div className="col-span-1 text-right">MLI</div>
-        <div className="col-span-1 text-right">dMLI_24h</div>
-        <div className="col-span-1 text-center">Cash</div>
-        <div className="col-span-2 text-right">Cycle</div>
+        <div className="col-span-1 text-right">ΔMEI</div>
+        <div className="col-span-1 text-right">ΔMLI</div>
+        <div className="col-span-4 text-center">Primitives</div>
       </div>
 
       {/* Entity List */}
       <div className="space-y-1">
-        {filteredActors.map((actor, index) => (
+        {filteredActors.map((actor) => (
           <Link
             key={actor.id}
-            href={`/actors/${actor.id}`}
+            href={`/entities/${actor.id}`}
             className="block border border-zinc-800/50 hover:border-zinc-600 hover:bg-zinc-900/30 transition-colors"
           >
-            {/* Desktop View */}
-            <div className="hidden md:grid grid-cols-12 gap-4 py-3 px-4 items-center font-mono text-sm">
-              <div className="col-span-1 text-center text-zinc-500 font-bold">
-                {index + 1}
-              </div>
-              <div className="col-span-3">
+            {/* Desktop */}
+            <div className="hidden lg:grid grid-cols-12 gap-2 py-3 px-4 items-center font-mono text-sm">
+              <div className="col-span-2">
                 <div className="text-white font-bold">{actor.name}</div>
-                <div className="text-zinc-600 text-[10px] uppercase">{actor.layer} · {actor.sector}</div>
+                <div className="text-zinc-600 text-[10px]">{getStatusLabel(actor.settlement_status || 'UNSETTLED')}</div>
               </div>
+              <div className="col-span-1 text-zinc-400 text-xs">{actor.sector}</div>
               <div className="col-span-1 text-center">
                 <span className={`text-[10px] uppercase px-2 py-1 ${
                   actor.settlement_status === 'SETTLED' ? 'bg-emerald-900/30 text-emerald-400' :
                   actor.settlement_status === 'PARTIAL' ? 'bg-yellow-900/30 text-yellow-400' :
+                  actor.settlement_status === 'OBSERVED' ? 'bg-blue-900/30 text-blue-400' :
                   'bg-red-900/30 text-red-400'
                 }`}>
-                  {actor.settlement_status}
+                  {actor.settlement_status || 'UNSETTLED'}
                 </span>
               </div>
               <div className="col-span-1 text-right">
@@ -109,62 +116,57 @@ export default function LeagueTablePage() {
                   {actor.scores.MEI}
                 </span>
               </div>
-              <div className="col-span-1 text-right text-red-400">
-                +{actor.scores.ΔMEI_24h || 0}
-              </div>
-              <div className="col-span-1 text-right text-zinc-300">
-                {actor.scores.MLI}
-              </div>
-              <div className="col-span-1 text-right text-zinc-500">
-                {actor.scores.ΔMLI_24h || 0}
-              </div>
-              <div className="col-span-1 text-center">
-                <span className={`text-[10px] uppercase ${
-                  actor.cash_state === 'cleared' ? 'text-emerald-400' :
-                  actor.cash_state === 'mismatch' ? 'text-yellow-400' : 'text-red-400'
-                }`}>
-                  {actor.cash_state}
+              <div className="col-span-1 text-right text-zinc-300">{actor.scores.MLI}</div>
+              <div className="col-span-1 text-right text-red-400">+{actor.scores.ΔMEI_24h || 0}</div>
+              <div className="col-span-1 text-right text-zinc-500">{actor.scores.ΔMLI_24h || 0}</div>
+              <div className="col-span-4 grid grid-cols-5 gap-1 text-center text-[10px]">
+                <span className={actor.primitives.MID.score >= 3 ? 'text-emerald-400' : 'text-red-400'}>
+                  MID {getPrimitiveCheck(actor.primitives.MID.score)}
                 </span>
-              </div>
-              <div className="col-span-2 text-right text-zinc-600 text-[10px]">
-                {actor.cycle_id}
+                <span className={actor.primitives.EI.score >= 3 ? 'text-emerald-400' : 'text-red-400'}>
+                  EI {getPrimitiveCheck(actor.primitives.EI.score)}
+                </span>
+                <span className={actor.primitives.M2M_SE.score >= 3 ? 'text-emerald-400' : 'text-red-400'}>
+                  M2M-SE {getPrimitiveCheck(actor.primitives.M2M_SE.score)}
+                </span>
+                <span className={actor.primitives.LCH.score >= 3 ? 'text-emerald-400' : 'text-red-400'}>
+                  LCH {getPrimitiveCheck(actor.primitives.LCH.score)}
+                </span>
+                <span className={actor.primitives.CSD.score >= 3 ? 'text-emerald-400' : 'text-red-400'}>
+                  CSD {getPrimitiveCheck(actor.primitives.CSD.score)}
+                </span>
               </div>
             </div>
 
-            {/* Mobile View */}
-            <div className="md:hidden p-4">
+            {/* Mobile */}
+            <div className="lg:hidden p-4">
               <div className="flex items-center justify-between gap-4 mb-2">
-                <div className="flex items-center gap-3">
-                  <span className="text-zinc-500 font-mono font-bold">#{index + 1}</span>
-                  <span className="text-white font-bold">{actor.name}</span>
-                </div>
+                <div className="text-white font-bold">{actor.name}</div>
                 <span className={`text-[10px] font-mono uppercase px-2 py-1 ${
                   actor.settlement_status === 'SETTLED' ? 'bg-emerald-900/30 text-emerald-400' :
                   actor.settlement_status === 'PARTIAL' ? 'bg-yellow-900/30 text-yellow-400' :
                   'bg-red-900/30 text-red-400'
                 }`}>
-                  {actor.settlement_status}
+                  {actor.settlement_status || 'UNSETTLED'}
                 </span>
               </div>
+              <div className="text-zinc-500 text-xs font-mono mb-2">{actor.sector} · {getStatusLabel(actor.settlement_status || 'UNSETTLED')}</div>
               <div className="grid grid-cols-4 gap-2 font-mono text-xs">
                 <div>
                   <div className="text-zinc-600 text-[10px]">MEI</div>
                   <div className={actor.scores.MEI > 150 ? 'text-red-500' : 'text-zinc-300'}>{actor.scores.MEI}</div>
                 </div>
                 <div>
-                  <div className="text-zinc-600 text-[10px]">dMEI</div>
-                  <div className="text-red-400">+{actor.scores.ΔMEI_24h || 0}</div>
-                </div>
-                <div>
                   <div className="text-zinc-600 text-[10px]">MLI</div>
                   <div className="text-zinc-300">{actor.scores.MLI}</div>
                 </div>
                 <div>
-                  <div className="text-zinc-600 text-[10px]">Cash</div>
-                  <div className={
-                    actor.cash_state === 'cleared' ? 'text-emerald-400' :
-                    actor.cash_state === 'mismatch' ? 'text-yellow-400' : 'text-red-400'
-                  }>{actor.cash_state}</div>
+                  <div className="text-zinc-600 text-[10px]">ΔMEI</div>
+                  <div className="text-red-400">+{actor.scores.ΔMEI_24h || 0}</div>
+                </div>
+                <div>
+                  <div className="text-zinc-600 text-[10px]">ΔMLI</div>
+                  <div className="text-zinc-500">{actor.scores.ΔMLI_24h || 0}</div>
                 </div>
               </div>
             </div>
@@ -173,14 +175,11 @@ export default function LeagueTablePage() {
       </div>
 
       {filteredActors.length === 0 && (
-        <div className="text-center text-zinc-500 py-12 font-mono">
-          No actors found.
-        </div>
+        <div className="text-center text-zinc-500 py-12 font-mono">No entities found.</div>
       )}
 
-      {/* Summary */}
       <div className="mt-6 text-[10px] text-zinc-600 font-mono">
-        {filteredActors.length} actors · Cycle: HP-STD-001 v1.10
+        {filteredActors.length} entities · HP-STD-001 v1.10
       </div>
     </div>
   )

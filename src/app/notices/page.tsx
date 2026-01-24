@@ -126,8 +126,18 @@ export default function NoticesPage() {
         </div>
       )}
 
+      {/* Open Letter Template */}
+      <div className="border border-white/10 bg-zinc-900/20 p-8 mt-12">
+        <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mb-6">Open Letter Template</div>
+        <div className="font-mono text-sm text-zinc-300 space-y-4 max-w-xl">
+          <p>Machine risk cannot be insured without machine-native clearing.</p>
+          <p>Until settlement primitives exist, losses are already occurring.</p>
+          <p className="text-emerald-400 pt-4">— Humain Pulse, Machine-Native Clearing Operator</p>
+        </div>
+      </div>
+
       <div className="mt-6 text-[10px] font-mono text-zinc-600">
-        {notices.length} notices · Cycle: HP-STD-001 v1.10
+        {notices.length} notices · HP-STD-001 v1.10
       </div>
     </div>
   )

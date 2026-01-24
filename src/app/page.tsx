@@ -4,17 +4,23 @@ import { getStats, ACTORS } from '@/lib/data'
 export default function HomePage() {
   const stats = getStats()
   const totalDeltaMEI = ACTORS.reduce((sum, a) => sum + (a.scores.ΔMEI_24h || 0), 0)
+  const timestamp = new Date().toISOString().split('T')[0]
 
   return (
     <div className="pt-32 px-6 md:px-12 animate-in">
       <div className="max-w-[1800px] mx-auto min-h-[80vh] flex flex-col justify-start">
 
         {/* HERO */}
-        <h1 className="text-3xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-white mb-4 uppercase leading-[0.9] max-w-4xl">
-          MACHINE-NATIVE CLEARING <span className="text-zinc-500">—</span> <span className="text-emerald-500">PUBLIC STATUS</span>
+        <h1 className="text-3xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-white mb-6 uppercase leading-[0.9] max-w-4xl">
+          Machine risk cannot be insured without machine-native clearing.
         </h1>
-        <p className="text-zinc-400 font-mono text-sm mb-8 max-w-xl">
-          Exposure states update daily. Settlement readiness is public. Loss is an accounting state.
+
+        <p className="text-zinc-400 font-mono text-lg mb-4 max-w-2xl">
+          Until settlement primitives exist, losses are already occurring.
+        </p>
+
+        <p className="text-emerald-500 font-mono text-sm mb-12">
+          Humain Pulse — Machine-Native Clearing Operator
         </p>
 
         {/* 3 Bullets */}
@@ -29,12 +35,19 @@ export default function HomePage() {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-emerald-500">→</span>
-            <span>Settlement: <span className="text-white">Publish → Propagate → Repeat</span></span>
+            <span>Cycle: <span className="text-white">HP-STD-001 v1.10</span> <span className="text-zinc-600">({timestamp})</span></span>
           </div>
         </div>
 
-        {/* Live Clearing Surface */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4 border border-white/10 p-6 bg-zinc-900/20">
+        {/* Accounting State */}
+        <div className="border border-white/10 bg-zinc-900/20 p-6 mb-8 max-w-xl">
+          <p className="text-zinc-300 font-mono text-sm">
+            This is an accounting state. Exposure accrues continuously until settlement is declared.
+          </p>
+        </div>
+
+        {/* Live Surface */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 border border-white/10 p-6 bg-zinc-900/20">
           <div>
             <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Entities</div>
             <div className="text-3xl text-white font-mono">{stats.total}</div>
@@ -51,72 +64,27 @@ export default function HomePage() {
             <div className="text-[10px] font-mono text-emerald-500 uppercase tracking-widest mb-1">Settled</div>
             <div className="text-3xl text-emerald-500 font-mono">{stats.conforming}</div>
           </div>
-          <div>
-            <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">ΔMEI_24h</div>
-            <div className="text-3xl text-white font-mono">+{totalDeltaMEI}</div>
-          </div>
-        </div>
-        <div className="text-[10px] font-mono text-zinc-600 mb-16">
-          Cycle: HP-STD-001 v1.10
         </div>
 
         {/* CTA */}
         <div className="flex flex-wrap gap-6 mb-24">
-          <Link href="/league-table" className="btn-primary">
-            View League Table
+          <Link href="/entities" className="btn-primary">
+            View Entities
           </Link>
-          <Link href="/status" className="btn-secondary">
-            View Status
+          <Link href="/hp-std-001" className="btn-secondary">
+            HP-STD-001
           </Link>
         </div>
 
-        {/* Highest Exposure */}
-        <div className="border-t border-white/10 pt-8">
-          <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mb-6">Highest Exposure</div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {ACTORS.sort((a, b) => b.scores.MEI - a.scores.MEI).slice(0, 4).map((actor) => (
-              <Link
-                key={actor.id}
-                href={`/actors/${actor.id}`}
-                className="border border-white/10 bg-zinc-900/30 p-4 hover:border-white/30 transition-colors group"
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <span className="text-[10px] font-mono text-zinc-500 uppercase">{actor.sector}</span>
-                  <span className={`text-[10px] font-mono uppercase px-2 py-0.5 ${
-                    actor.settlement_status === 'SETTLED' ? 'bg-emerald-900/50 text-emerald-400' :
-                    actor.settlement_status === 'PARTIAL' ? 'bg-yellow-900/50 text-yellow-400' :
-                    'bg-red-900/50 text-red-400'
-                  }`}>
-                    {actor.settlement_status}
-                  </span>
-                </div>
-                <h4 className="text-white font-bold text-lg mb-3 group-hover:text-emerald-400 transition-colors">
-                  {actor.name}
-                </h4>
-                <div className="grid grid-cols-2 gap-2 font-mono text-sm">
-                  <div>
-                    <div className="text-[10px] text-zinc-600">MEI</div>
-                    <div className={actor.scores.MEI > 150 ? 'text-red-500' : 'text-zinc-300'}>{actor.scores.MEI}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-zinc-600">ΔMEI_24h</div>
-                    <div className="text-red-400">+{actor.scores.ΔMEI_24h || 0}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-zinc-600">MLI</div>
-                    <div className="text-zinc-300">{actor.scores.MLI}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-zinc-600">Cash</div>
-                    <div className={`text-xs ${
-                      actor.cash_state === 'cleared' ? 'text-emerald-400' :
-                      actor.cash_state === 'mismatch' ? 'text-yellow-400' : 'text-red-400'
-                    }`}>{actor.cash_state}</div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+        {/* Chokepoint */}
+        <div className="border-t border-white/10 pt-8 max-w-xl">
+          <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mb-4">Chokepoint</div>
+          <p className="text-zinc-300 font-mono text-sm mb-2">
+            MID + M2M-SE = machine-native clearing possible.
+          </p>
+          <p className="text-red-400 font-mono text-sm">
+            No MID + no M2M-SE = UNSETTLED. Losses accumulating.
+          </p>
         </div>
       </div>
     </div>

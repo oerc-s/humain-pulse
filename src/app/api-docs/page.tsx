@@ -1,31 +1,36 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Clearing API',
-  description: 'HP-STD-001 machine integration endpoints. JSON only.',
-  keywords: ['clearing API', 'HP-STD-001', 'JSON API', 'machine integration'],
+  title: 'API | HP-STD-001',
+  description: 'Machine-native clearing API. JSON endpoints for entities, notices, and HP-STD-001.',
+  keywords: ['API', 'HP-STD-001', 'JSON', 'machine integration'],
 }
 
 export default function ApiDocsPage() {
   const endpoints = [
     {
       method: 'GET',
-      path: '/api/clearing/actors',
-      desc: 'All actors with clearing state',
+      path: '/api/v1/entities',
+      desc: 'All entities with clearing state',
       response: `{
-  "actors": [
+  "entities": [
     {
-      "actor_id": "munich-re",
-      "name": "Munich Re",
+      "actor": "munich-re",
       "sector": "Reinsurance",
       "status": "UNSETTLED",
-      "MEI": 148,
-      "ΔMEI_24h": 3,
-      "MLI": 10,
-      "ΔMLI_24h": 0,
-      "cash_state": "accumulating",
-      "timestamp": "2026-01-23T00:00:00Z",
-      "cycle_id": "HP-STD-001 v1.10"
+      "mei": 148,
+      "mli": 10,
+      "dmei_24h": 3,
+      "dmli_24h": 0,
+      "primitives": {
+        "mid": true,
+        "ei": false,
+        "m2m_se": false,
+        "lch": true,
+        "csd": false
+      },
+      "cycle_version": "HP-STD-001 v1.10",
+      "updated_at": "2026-01-24T00:00:00Z"
     }
   ],
   "total": 22
@@ -33,71 +38,83 @@ export default function ApiDocsPage() {
     },
     {
       method: 'GET',
-      path: '/api/clearing/state',
-      desc: 'Live clearing surface metrics',
+      path: '/api/v1/entities/:slug',
+      desc: 'Single entity clearing state',
       response: `{
-  "unsettled": 17,
-  "partial": 4,
-  "settled": 1,
-  "observed": 0,
-  "total_MEI": 2840,
-  "total_ΔMEI_24h": 56,
-  "cycle_id": "HP-STD-001 v1.10",
-  "timestamp": "2026-01-23T12:00:00Z"
-}`
-    },
-    {
-      method: 'GET',
-      path: '/api/clearing/actors/:id',
-      desc: 'Single actor clearing state',
-      response: `{
-  "actor_id": "munich-re",
-  "name": "Munich Re",
+  "actor": "munich-re",
   "sector": "Reinsurance",
+  "layer": "Capital",
   "status": "UNSETTLED",
+  "mei": 148,
+  "mli": 10,
+  "dmei_24h": 3,
+  "dmli_24h": 0,
   "primitives": {
-    "MID": true,
-    "EI": false,
-    "M2M_SE": false,
-    "LCH": true,
-    "CSD": false
+    "mid": true,
+    "ei": false,
+    "m2m_se": false,
+    "lch": true,
+    "csd": false
   },
-  "MEI": 148,
-  "ΔMEI_24h": 3,
-  "MLI": 10,
-  "ΔMLI_24h": 0,
-  "cash_state": "accumulating",
-  "timestamp": "2026-01-23T00:00:00Z",
-  "cycle_id": "HP-STD-001 v1.10"
+  "cycle_version": "HP-STD-001 v1.10",
+  "updated_at": "2026-01-24T00:00:00Z"
 }`
     },
     {
       method: 'GET',
-      path: '/api/clearing/notices',
-      desc: 'Public clearing events',
+      path: '/api/v1/league-table',
+      desc: 'Entities ranked by MEI descending',
+      response: `{
+  "rankings": [
+    {
+      "rank": 1,
+      "actor": "boston-dynamics",
+      "sector": "Robotics",
+      "status": "OBSERVED",
+      "mei": 195,
+      "mli": 5
+    }
+  ],
+  "total": 22,
+  "updated_at": "2026-01-24T00:00:00Z"
+}`
+    },
+    {
+      method: 'GET',
+      path: '/api/v1/notices',
+      desc: 'Public clearing notices',
       response: `{
   "notices": [
     {
-      "notice_id": "MED-MUNICH-RE-2026-001",
-      "actor_id": "munich-re",
+      "notice_id": "HP-NTC-2026-001",
+      "actor": "munich-re",
       "status": "UNSETTLED",
-      "MEI": 148,
-      "ΔMEI_24h": 3,
-      "MLI": 10,
-      "ΔMLI_24h": 0,
-      "cash_state": "accumulating",
-      "timestamp": "2026-01-23T00:00:00Z",
-      "cycle_id": "HP-STD-001 v1.10"
+      "mei": 148,
+      "dmei_24h": 3,
+      "timestamp": "2026-01-24T00:00:00Z",
+      "cycle_version": "HP-STD-001 v1.10"
     }
   ],
   "total": 35
+}`
+    },
+    {
+      method: 'GET',
+      path: '/api/v1/hp-std-001',
+      desc: 'HP-STD-001 specification',
+      response: `{
+  "version": "1.10",
+  "primitives": ["MID", "EI", "M2M-SE", "LCH", "CSD"],
+  "indices": ["MEI", "MLI", "MAEI"],
+  "statuses": ["UNSETTLED", "PARTIAL", "SETTLED", "OBSERVED"],
+  "rule": "No MID + no M2M-SE = UNSETTLED"
 }`
     },
   ]
 
   return (
     <div className="pt-32 pb-24 px-6 md:px-12 max-w-[1400px] mx-auto animate-in">
-      <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-4">Clearing API</h1>
+      <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">API</h1>
       <p className="text-zinc-500 font-mono text-sm mb-8">
         HP-STD-001 machine integration. JSON only.
       </p>
@@ -105,7 +122,7 @@ export default function ApiDocsPage() {
       {/* Base URL */}
       <div className="border border-zinc-800 bg-zinc-900/30 p-4 mb-8">
         <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">Base URL</div>
-        <code className="text-emerald-400 font-mono">https://humain-pulse.com/api</code>
+        <code className="text-emerald-400 font-mono">https://humain-pulse.com/api/v1</code>
       </div>
 
       {/* Endpoints */}
@@ -129,54 +146,27 @@ export default function ApiDocsPage() {
         ))}
       </div>
 
-      {/* State Values */}
+      {/* Response Schema */}
       <div className="border border-zinc-800 bg-zinc-900/20 p-6 mt-12">
         <h2 className="font-mono text-sm uppercase tracking-widest text-emerald-500 mb-6 border-b border-white/10 pb-2">
-          State Values
+          Response Schema
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono text-sm">
-          <div>
-            <div className="text-red-500 font-bold">UNSETTLED</div>
-            <div className="text-zinc-500 text-xs">MLI &lt; 40</div>
-          </div>
-          <div>
-            <div className="text-yellow-500 font-bold">PARTIAL</div>
-            <div className="text-zinc-500 text-xs">40 ≤ MLI &lt; 80</div>
-          </div>
-          <div>
-            <div className="text-emerald-500 font-bold">SETTLED</div>
-            <div className="text-zinc-500 text-xs">MLI ≥ 80</div>
-          </div>
-          <div>
-            <div className="text-zinc-400 font-bold">OBSERVED</div>
-            <div className="text-zinc-500 text-xs">Detected, unattributed</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Cash States */}
-      <div className="border border-zinc-800 bg-zinc-900/20 p-6 mt-6">
-        <h2 className="font-mono text-sm uppercase tracking-widest text-emerald-500 mb-6 border-b border-white/10 pb-2">
-          Cash States
-        </h2>
-        <div className="grid grid-cols-3 gap-4 font-mono text-sm">
-          <div>
-            <div className="text-red-400 font-bold">accumulating</div>
-            <div className="text-zinc-500 text-xs">Exposure debt active</div>
-          </div>
-          <div>
-            <div className="text-yellow-400 font-bold">mismatch</div>
-            <div className="text-zinc-500 text-xs">Partial reconciliation</div>
-          </div>
-          <div>
-            <div className="text-emerald-400 font-bold">cleared</div>
-            <div className="text-zinc-500 text-xs">Settlement complete</div>
-          </div>
+        <div className="font-mono text-sm text-zinc-400 space-y-2">
+          <div><span className="text-white">actor</span>: string — entity slug</div>
+          <div><span className="text-white">sector</span>: string — sector name</div>
+          <div><span className="text-white">status</span>: UNSETTLED | PARTIAL | SETTLED | OBSERVED</div>
+          <div><span className="text-white">mei</span>: integer (0-1000)</div>
+          <div><span className="text-white">mli</span>: integer (0-100)</div>
+          <div><span className="text-white">dmei_24h</span>: integer delta</div>
+          <div><span className="text-white">dmli_24h</span>: integer delta</div>
+          <div><span className="text-white">primitives</span>: {"{"} mid, ei, m2m_se, lch, csd {"}"} — booleans</div>
+          <div><span className="text-white">cycle_version</span>: string</div>
+          <div><span className="text-white">updated_at</span>: ISO 8601 timestamp</div>
         </div>
       </div>
 
       <div className="mt-8 text-[10px] font-mono text-zinc-600">
-        Cycle: HP-STD-001 v1.10
+        HP-STD-001 v1.10
       </div>
     </div>
   )
