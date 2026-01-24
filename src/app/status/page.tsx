@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 const statusDefinitions = [
   {
     status: 'UNSETTLED',
-    color: 'red',
     threshold: 'MLI < 40',
     description: 'Entity has fewer than 2 primitives at score 3+. Exposure accrues daily. Settlement unavailable.',
     implications: [
@@ -19,11 +18,14 @@ const statusDefinitions = [
       'Cash state: accumulating',
       'No clearing eligibility',
       'Public exposure notice active',
-    ]
+    ],
+    bgClass: 'bg-red-950/20',
+    textClass: 'text-red-400',
+    borderClass: 'border-red-400/30',
+    arrowClass: 'text-red-500',
   },
   {
     status: 'PARTIAL',
-    color: 'yellow',
     threshold: '40 ≤ MLI < 80',
     description: 'Entity has 2-3 primitives at score 3+. Partial settlement readiness. Exposure accrues at reduced rate.',
     implications: [
@@ -31,11 +33,14 @@ const statusDefinitions = [
       'Cash state: mismatch',
       'Conditional clearing eligibility',
       'Remediation path available',
-    ]
+    ],
+    bgClass: 'bg-yellow-950/20',
+    textClass: 'text-yellow-400',
+    borderClass: 'border-yellow-400/30',
+    arrowClass: 'text-yellow-500',
   },
   {
     status: 'SETTLED',
-    color: 'emerald',
     threshold: 'MLI ≥ 80',
     description: 'Entity has 4+ primitives at score 3+. Full settlement readiness. Exposure cleared.',
     implications: [
@@ -43,11 +48,14 @@ const statusDefinitions = [
       'Cash state: cleared',
       'Full clearing eligibility',
       'Settlement active',
-    ]
+    ],
+    bgClass: 'bg-emerald-950/20',
+    textClass: 'text-emerald-400',
+    borderClass: 'border-emerald-400/30',
+    arrowClass: 'text-emerald-500',
   },
   {
     status: 'OBSERVED',
-    color: 'zinc',
     threshold: 'Detected, unattributed',
     description: 'Machine activity detected but not yet attributed to a registered actor. Pending identification.',
     implications: [
@@ -55,7 +63,11 @@ const statusDefinitions = [
       'Cash state: pending',
       'Attribution in progress',
       'May transition to UNSETTLED',
-    ]
+    ],
+    bgClass: 'bg-zinc-950/20',
+    textClass: 'text-zinc-400',
+    borderClass: 'border-zinc-400/30',
+    arrowClass: 'text-zinc-500',
   },
 ]
 
@@ -101,10 +113,10 @@ export default function StatusPage() {
       <div className="space-y-6">
         {statusDefinitions.map((def) => (
           <div key={def.status} className="border border-white/10 bg-zinc-900/20">
-            <div className={`p-6 border-b border-white/10 bg-${def.color}-950/20`}>
+            <div className={`p-6 border-b border-white/10 ${def.bgClass}`}>
               <div className="flex items-center justify-between mb-2">
-                <span className={`text-${def.color}-400 font-mono font-bold text-2xl`}>{def.status}</span>
-                <span className={`text-${def.color}-400 font-mono text-sm border border-${def.color}-400/30 px-3 py-1`}>
+                <span className={`${def.textClass} font-mono font-bold text-2xl`}>{def.status}</span>
+                <span className={`${def.textClass} font-mono text-sm border ${def.borderClass} px-3 py-1`}>
                   {def.threshold}
                 </span>
               </div>
@@ -115,7 +127,7 @@ export default function StatusPage() {
               <ul className="space-y-2">
                 {def.implications.map((imp, i) => (
                   <li key={i} className="flex items-center gap-3 font-mono text-sm text-zinc-400">
-                    <span className={`text-${def.color}-500`}>→</span>
+                    <span className={def.arrowClass}>→</span>
                     <span>{imp}</span>
                   </li>
                 ))}
