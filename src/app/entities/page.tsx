@@ -1,11 +1,34 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ACTORS } from '@/lib/data'
-import type { Layer } from '@/types'
 
-type TabFilter = 'All' | Layer
+type ClearingStatus = 'UNSETTLED' | 'PARTIAL' | 'SETTLED'
+
+interface ClearingActor {
+  actor_id: string
+  name: string
+  layer: string
+  sector: string
+  status: ClearingStatus
+  primitives: {
+    MID: boolean
+    EI: boolean
+    M2M_SE: boolean
+    LCH: boolean
+    CSD: boolean
+  }
+}
+
+interface ClearingActorWithExposure {
+  actor: ClearingActor
+  exposure: {
+    MEI: number
+    MLI: number
+  }
+}
+
+type TabFilter = 'All' | 'Capital' | 'Compute' | 'Intelligence' | 'Actuation'
 
 function getBand(value: number): { label: string; color: string } {
   if (value >= 150) return { label: 'CRITICAL', color: 'text-red-500' }
@@ -13,32 +36,54 @@ function getBand(value: number): { label: string; color: string } {
   return { label: 'LOW', color: 'text-zinc-400' }
 }
 
-function getStatusDisplay(status: string): string {
+function getStatusDisplay(status: ClearingStatus): string {
   switch (status) {
     case 'SETTLED': return 'Settled'
     case 'PARTIAL': return 'Clearable'
-    case 'OBSERVED': return 'Observed'
     default: return 'Non-Clearable'
   }
 }
 
-function getPrimitive(score: number): string {
-  return score >= 3 ? '✓' : '✗'
+function getStatusColor(status: ClearingStatus): string {
+  switch (status) {
+    case 'SETTLED': return 'bg-emerald-900/30 text-emerald-400'
+    case 'PARTIAL': return 'bg-yellow-900/30 text-yellow-400'
+    default: return 'bg-red-900/30 text-red-400'
+  }
 }
 
 export default function EntitiesPage() {
+  const [actors, setActors] = useState<ClearingActorWithExposure[]>([])
+  const [loading, setLoading] = useState(true)
   const [filterLayer, setFilterLayer] = useState<TabFilter>('All')
 
-  const filteredActors = useMemo(() => {
-    let list = [...ACTORS]
-    if (filterLayer !== 'All') {
-      list = list.filter(a => a.layer === filterLayer)
-    }
-    list.sort((a, b) => b.scores.MEI - a.scores.MEI)
-    return list.slice(0, 50)
-  }, [filterLayer])
+  useEffect(() => {
+    fetch('/api/clearing/actors')
+      .then(res => res.json())
+      .then(data => {
+        setActors(data.actors || [])
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
+
+  const filteredActors = actors
+    .filter(a => filterLayer === 'All' || a.actor.layer === filterLayer)
+    .sort((a, b) => b.exposure.MEI - a.exposure.MEI)
+    .slice(0, 50)
 
   const tabs: TabFilter[] = ['All', 'Capital', 'Compute', 'Intelligence', 'Actuation']
+
+  if (loading) {
+    return (
+      <div className="pt-32 pb-20 px-6 md:px-12 min-h-screen max-w-[1800px] mx-auto animate-in">
+        <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">
+          Public Registry
+        </h1>
+        <p className="text-zinc-500 font-mono text-sm">Loading clearing state...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="pt-32 pb-20 px-6 md:px-12 min-h-screen max-w-[1800px] mx-auto animate-in">
@@ -46,7 +91,7 @@ export default function EntitiesPage() {
         Public Registry
       </h1>
       <p className="text-zinc-500 font-mono text-sm mb-6">
-        Real-time exposure state for all entities. MEI / MLI / Δ24h.
+        Real-time exposure state for all entities. MEI / MLI.
       </p>
 
       {/* Scale */}
@@ -69,69 +114,59 @@ export default function EntitiesPage() {
 
       {/* Table Header */}
       <div className="hidden lg:grid grid-cols-12 gap-2 py-3 border-b border-white/10 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">
-        <div className="col-span-2">Actor</div>
+        <div className="col-span-3">Actor</div>
         <div className="col-span-1">Sector</div>
         <div className="col-span-1 text-center">Status</div>
         <div className="col-span-1 text-right">MEI</div>
         <div className="col-span-1 text-right">MLI</div>
-        <div className="col-span-1 text-right">ΔMEI</div>
-        <div className="col-span-1 text-right">ΔMLI</div>
-        <div className="col-span-4 text-center">Primitives (MID/EI/M2M-SE/LCH/CSD)</div>
+        <div className="col-span-5 text-center">Primitives (MID/EI/M2M-SE/LCH/CSD)</div>
       </div>
 
       {/* Rows */}
       <div className="space-y-1">
-        {filteredActors.map((actor) => {
-          const meiBand = getBand(actor.scores.MEI)
-          const mliBand = getBand(actor.scores.MLI)
+        {filteredActors.map(({ actor, exposure }) => {
+          const meiBand = getBand(exposure.MEI)
 
           return (
             <Link
-              key={actor.id}
-              href={`/entities/${actor.id}`}
+              key={actor.actor_id}
+              href={`/entities/${actor.actor_id}`}
               className="block border border-zinc-800/50 hover:border-zinc-600 hover:bg-zinc-900/30 transition-colors"
             >
               {/* Desktop */}
               <div className="hidden lg:grid grid-cols-12 gap-2 py-3 px-4 items-center font-mono text-sm">
-                <div className="col-span-2">
+                <div className="col-span-3">
                   <div className="text-white font-bold">{actor.name}</div>
-                  <div className="text-zinc-600 text-[10px]">{getStatusDisplay(actor.settlement_status || 'UNSETTLED')}</div>
+                  <div className="text-zinc-600 text-[10px]">{actor.actor_id}</div>
                 </div>
                 <div className="col-span-1 text-zinc-400 text-xs">{actor.sector}</div>
                 <div className="col-span-1 text-center">
-                  <span className={`text-[10px] uppercase px-2 py-1 ${
-                    actor.settlement_status === 'SETTLED' ? 'bg-emerald-900/30 text-emerald-400' :
-                    actor.settlement_status === 'PARTIAL' ? 'bg-yellow-900/30 text-yellow-400' :
-                    actor.settlement_status === 'OBSERVED' ? 'bg-blue-900/30 text-blue-400' :
-                    'bg-red-900/30 text-red-400'
-                  }`}>
-                    {getStatusDisplay(actor.settlement_status || 'UNSETTLED')}
+                  <span className={`text-[10px] uppercase px-2 py-1 ${getStatusColor(actor.status)}`}>
+                    {getStatusDisplay(actor.status)}
                   </span>
                 </div>
                 <div className="col-span-1 text-right">
-                  <span className={meiBand.color}>{actor.scores.MEI}</span>
+                  <span className={meiBand.color}>{exposure.MEI.toFixed(1)}</span>
                   <span className={`text-[8px] ml-1 ${meiBand.color}`}>{meiBand.label}</span>
                 </div>
                 <div className="col-span-1 text-right">
-                  <span className={mliBand.color}>{actor.scores.MLI}</span>
+                  <span className="text-zinc-300">{exposure.MLI}</span>
                 </div>
-                <div className="col-span-1 text-right text-red-400">+{actor.scores.ΔMEI_24h || 0}</div>
-                <div className="col-span-1 text-right text-zinc-500">{actor.scores.ΔMLI_24h || 0}</div>
-                <div className="col-span-4 flex justify-center gap-3 text-[10px]">
-                  <span className={actor.primitives.MID.score >= 3 ? 'text-emerald-400' : 'text-red-400'}>
-                    MID:{getPrimitive(actor.primitives.MID.score)}
+                <div className="col-span-5 flex justify-center gap-3 text-[10px]">
+                  <span className={actor.primitives.MID ? 'text-emerald-400' : 'text-red-400'}>
+                    MID:{actor.primitives.MID ? '✓' : '✗'}
                   </span>
-                  <span className={actor.primitives.EI.score >= 3 ? 'text-emerald-400' : 'text-red-400'}>
-                    EI:{getPrimitive(actor.primitives.EI.score)}
+                  <span className={actor.primitives.EI ? 'text-emerald-400' : 'text-red-400'}>
+                    EI:{actor.primitives.EI ? '✓' : '✗'}
                   </span>
-                  <span className={actor.primitives.M2M_SE.score >= 3 ? 'text-emerald-400' : 'text-red-400'}>
-                    M2M-SE:{getPrimitive(actor.primitives.M2M_SE.score)}
+                  <span className={actor.primitives.M2M_SE ? 'text-emerald-400' : 'text-red-400'}>
+                    M2M-SE:{actor.primitives.M2M_SE ? '✓' : '✗'}
                   </span>
-                  <span className={actor.primitives.LCH.score >= 3 ? 'text-emerald-400' : 'text-red-400'}>
-                    LCH:{getPrimitive(actor.primitives.LCH.score)}
+                  <span className={actor.primitives.LCH ? 'text-emerald-400' : 'text-red-400'}>
+                    LCH:{actor.primitives.LCH ? '✓' : '✗'}
                   </span>
-                  <span className={actor.primitives.CSD.score >= 3 ? 'text-emerald-400' : 'text-red-400'}>
-                    CSD:{getPrimitive(actor.primitives.CSD.score)}
+                  <span className={actor.primitives.CSD ? 'text-emerald-400' : 'text-red-400'}>
+                    CSD:{actor.primitives.CSD ? '✓' : '✗'}
                   </span>
                 </div>
               </div>
@@ -140,31 +175,19 @@ export default function EntitiesPage() {
               <div className="lg:hidden p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-white font-bold">{actor.name}</span>
-                  <span className={`text-[10px] font-mono uppercase px-2 py-1 ${
-                    actor.settlement_status === 'SETTLED' ? 'bg-emerald-900/30 text-emerald-400' :
-                    actor.settlement_status === 'PARTIAL' ? 'bg-yellow-900/30 text-yellow-400' :
-                    'bg-red-900/30 text-red-400'
-                  }`}>
-                    {getStatusDisplay(actor.settlement_status || 'UNSETTLED')}
+                  <span className={`text-[10px] font-mono uppercase px-2 py-1 ${getStatusColor(actor.status)}`}>
+                    {getStatusDisplay(actor.status)}
                   </span>
                 </div>
                 <div className="text-zinc-500 text-xs font-mono mb-2">{actor.sector}</div>
-                <div className="grid grid-cols-4 gap-2 font-mono text-xs">
+                <div className="grid grid-cols-2 gap-2 font-mono text-xs">
                   <div>
                     <div className="text-zinc-600 text-[10px]">MEI</div>
-                    <div className={meiBand.color}>{actor.scores.MEI}</div>
+                    <div className={meiBand.color}>{exposure.MEI.toFixed(1)}</div>
                   </div>
                   <div>
                     <div className="text-zinc-600 text-[10px]">MLI</div>
-                    <div className="text-zinc-300">{actor.scores.MLI}</div>
-                  </div>
-                  <div>
-                    <div className="text-zinc-600 text-[10px]">ΔMEI</div>
-                    <div className="text-red-400">+{actor.scores.ΔMEI_24h || 0}</div>
-                  </div>
-                  <div>
-                    <div className="text-zinc-600 text-[10px]">ΔMLI</div>
-                    <div className="text-zinc-500">{actor.scores.ΔMLI_24h || 0}</div>
+                    <div className="text-zinc-300">{exposure.MLI}</div>
                   </div>
                 </div>
               </div>
@@ -174,7 +197,7 @@ export default function EntitiesPage() {
       </div>
 
       <div className="mt-6 text-[10px] text-zinc-600 font-mono">
-        Top {filteredActors.length} by MEI · HP-STD-001 v1.10
+        {filteredActors.length} entities · HP-STD-001 v1.10
       </div>
     </div>
   )
