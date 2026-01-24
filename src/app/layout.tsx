@@ -20,20 +20,21 @@ const BASE_URL = 'https://humain-pulse.com'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Humain Pulse — Machine-Native Clearing Operator',
+    default: 'Humain Pulse | Machine-Native Risk Clearing Operator',
     template: '%s | Humain Pulse'
   },
-  description: 'Machine exposure exists. Clearing changes state. Humain Pulse operates machine-native exposure clearing.',
+  description: 'Market infrastructure for machine-native risk clearing. Real-time classification: Non-Clearable / Clearable / Settled. Exposure accrues automatically (MEI / MLI / Δ24h). Primitives + APIs.',
   keywords: [
-    'machine exposure clearing',
+    'machine-native risk',
+    'AGI risk',
+    'AI risk clearing',
+    'AI-to-AI settlement',
+    'MID',
+    'MEI',
+    'MLI',
     'clearing operator',
-    'settlement layer',
-    'exposure normalization',
-    'machine-native clearing',
-    'HP-STD-001',
-    'exposure accrual',
-    'state transition',
-    'clearing execution'
+    'settlement primitives',
+    'HP-STD-001'
   ],
   authors: [{ name: 'Humain Pulse' }],
   creator: 'Humain Pulse',
@@ -44,21 +45,21 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: BASE_URL,
     siteName: 'Humain Pulse',
-    title: 'Humain Pulse — Machine-Native Clearing Operator',
-    description: 'Machine exposure exists. Clearing changes state.',
+    title: 'Humain Pulse | Machine-Native Risk Clearing Operator',
+    description: 'Market infrastructure for machine-native risk clearing. Real-time classification: Non-Clearable / Clearable / Settled. Exposure accrues automatically (MEI / MLI / Δ24h).',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Humain Pulse — Machine-Native Clearing Operator'
+        alt: 'Humain Pulse | Machine-Native Risk Clearing Operator'
       }
     ]
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Humain Pulse — Machine-Native Clearing Operator',
-    description: 'Machine exposure exists. Clearing changes state.',
+    title: 'Humain Pulse | Machine-Native Risk Clearing Operator',
+    description: 'Market infrastructure for machine-native risk clearing. Real-time classification: Non-Clearable / Clearable / Settled.',
     images: ['/og-image.png']
   },
   robots: {
@@ -70,7 +71,11 @@ export const metadata: Metadata = {
     }
   },
   alternates: {
-    canonical: BASE_URL
+    canonical: BASE_URL,
+    languages: {
+      'en-US': BASE_URL,
+      'fr-FR': `${BASE_URL}/fr`
+    }
   }
 }
 
@@ -78,7 +83,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Humain Pulse',
-  description: 'Machine-native clearing operator. Exposure normalization engine.',
+  description: 'Market infrastructure for machine-native risk clearing. Real-time classification and settlement.',
   url: BASE_URL,
   sameAs: [],
 }

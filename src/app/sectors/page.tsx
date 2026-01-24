@@ -1,39 +1,39 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Sector Scoring Profiles | HP-STD-001',
-  description: 'Sector weights and chokepoints for machine-native clearing.',
+  title: 'Sector Profiles | Market Coverage',
+  description: 'Sector weights and chokepoints across Capital, Compute, Intelligence, and Actuation layers.',
 }
 
 const sectors = [
   {
     layer: 'Capital',
     items: [
-      { name: 'Reinsurance', weight: 1.0, chokepoint: 'MID + M2M-SE missing → UNSETTLED' },
-      { name: 'Brokers', weight: 0.8, chokepoint: 'M2M-SE missing → PARTIAL' },
-      { name: 'Ratings', weight: 0.6, chokepoint: 'EI missing → PARTIAL' },
-      { name: 'ILS / Capital Markets', weight: 0.9, chokepoint: 'LCH missing → PARTIAL' },
-      { name: 'Funds / Allocators', weight: 0.7, chokepoint: 'EI missing → PARTIAL' },
+      { name: 'Reinsurance', weight: 1.0, chokepoint: 'MID + M2M-SE missing → Non-Clearable' },
+      { name: 'Brokers', weight: 0.8, chokepoint: 'M2M-SE missing → Clearable (proxy)' },
+      { name: 'Ratings', weight: 0.6, chokepoint: 'EI missing → Clearable (proxy)' },
+      { name: 'ILS / Capital Markets', weight: 0.9, chokepoint: 'LCH missing → Clearable (proxy)' },
+      { name: 'Funds / Allocators', weight: 0.7, chokepoint: 'EI missing → Clearable (proxy)' },
     ]
   },
   {
     layer: 'Compute',
     items: [
-      { name: 'Cloud Providers', weight: 1.0, chokepoint: 'MID + M2M-SE missing → UNSETTLED' },
-      { name: 'Integrators', weight: 0.7, chokepoint: 'CSD missing → PARTIAL' },
+      { name: 'Cloud Providers', weight: 1.0, chokepoint: 'MID + M2M-SE missing → Non-Clearable' },
+      { name: 'Integrators', weight: 0.7, chokepoint: 'CSD missing → Clearable (proxy)' },
     ]
   },
   {
     layer: 'Intelligence',
     items: [
-      { name: 'AI Labs', weight: 1.0, chokepoint: 'MID + M2M-SE missing → UNSETTLED' },
-      { name: 'Auditors', weight: 0.6, chokepoint: 'LCH missing → PARTIAL' },
+      { name: 'AI Labs', weight: 1.0, chokepoint: 'MID + M2M-SE missing → Non-Clearable' },
+      { name: 'Auditors', weight: 0.6, chokepoint: 'LCH missing → Clearable (proxy)' },
     ]
   },
   {
     layer: 'Actuation',
     items: [
-      { name: 'Robotics', weight: 1.0, chokepoint: 'MID + CSD missing → OBSERVED' },
+      { name: 'Robotics', weight: 1.0, chokepoint: 'MID + CSD missing → Observed' },
     ]
   },
 ]
@@ -41,9 +41,12 @@ const sectors = [
 export default function SectorsPage() {
   return (
     <div className="pt-32 pb-24 px-6 md:px-12 max-w-[1200px] mx-auto animate-in">
-      <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-8">
-        Sector Scoring Profiles
+      <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">
+        Sector Profiles
       </h1>
+      <p className="text-zinc-500 font-mono text-sm mb-8">
+        Market coverage across four layers. Weights and chokepoints per sector.
+      </p>
 
       <div className="space-y-8">
         {sectors.map(({ layer, items }) => (

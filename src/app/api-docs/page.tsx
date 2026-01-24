@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: '/v1 — States + Indices + Primitives | HP-STD-001',
-  description: 'Machine-native clearing API endpoints.',
+  title: 'Infrastructure API | Machine-Native Endpoints',
+  description: 'Public API for machine-native risk clearing. States, indices, primitives. Machine-to-machine settlement.',
 }
 
 const endpoints = [
@@ -15,9 +15,12 @@ const endpoints = [
 export default function ApiDocsPage() {
   return (
     <div className="pt-32 pb-24 px-6 md:px-12 max-w-[1000px] mx-auto animate-in">
-      <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-8">
-        /v1 — States + Indices + Primitives
+      <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">
+        Infrastructure API
       </h1>
+      <p className="text-zinc-500 font-mono text-sm mb-8">
+        Public endpoints for machine-to-machine settlement.
+      </p>
 
       <div className="border border-zinc-800 bg-zinc-900/30 p-4 mb-8">
         <code className="text-emerald-400 font-mono">https://humain-pulse.com/api</code>

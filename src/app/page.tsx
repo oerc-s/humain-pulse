@@ -13,26 +13,35 @@ export default function HomePage() {
           Humain Pulse — Machine-Native Clearing Operator
         </h1>
 
-        <p className="text-zinc-400 font-mono text-sm mb-4 max-w-2xl">
-          Market infrastructure for machine-native risk clearing.
-        </p>
-        <p className="text-zinc-500 font-mono text-xs mb-12 max-w-2xl">
-          Autonomous systems risk is Non-Clearable by default unless attested under HP-STD-001.
-        </p>
+        {/* Why */}
+        <div className="border-l-2 border-zinc-700 pl-4 mb-12 max-w-2xl space-y-3">
+          <p className="text-zinc-300 font-mono text-sm">
+            Autonomous systems (AI software, agents, and robotic systems) act continuously and at machine speed.
+          </p>
+          <p className="text-zinc-400 font-mono text-sm">
+            Human processes can't keep up.
+          </p>
+          <p className="text-zinc-300 font-mono text-sm">
+            That's why risk must be measured and cleared in real time, by machines.
+          </p>
+          <p className="text-white font-mono text-sm mt-4">
+            Humain Pulse provides a public registry and machine-native attestation to switch an entity from exposed to clearable.
+          </p>
+        </div>
 
-        {/* 3 Bullets */}
+        {/* Certification */}
         <div className="space-y-2 font-mono text-sm text-zinc-400 mb-12">
           <div className="flex items-center gap-3">
             <span className="text-emerald-500">→</span>
-            <span>Public states: <span className="text-white">UNSETTLED / PARTIAL / SETTLED / OBSERVED</span></span>
+            <span>Real-time classification: <span className="text-white">Non-Clearable / Clearable / Settled</span></span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-emerald-500">→</span>
-            <span>Indices: <span className="text-white">MEI + MLI + Δ24h</span></span>
+            <span>Exposure accrues automatically while Non-Clearable <span className="text-white">(MEI / MLI / Δ24h)</span></span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-emerald-500">→</span>
-            <span>Cycle: <span className="text-white">HP-STD-001 v1.10</span> · Last: {lastCycle}</span>
+            <span>Proofs served via <span className="text-white">HP-STD-001 primitives and APIs</span></span>
           </div>
         </div>
 
@@ -43,11 +52,11 @@ export default function HomePage() {
             <div className="text-2xl text-white font-mono">{stats.total}</div>
           </div>
           <div>
-            <div className="text-[10px] font-mono text-red-500 uppercase mb-1">Unsettled</div>
+            <div className="text-[10px] font-mono text-red-500 uppercase mb-1">Non-Clearable</div>
             <div className="text-2xl text-red-500 font-mono">{stats.nonConforming}</div>
           </div>
           <div>
-            <div className="text-[10px] font-mono text-yellow-500 uppercase mb-1">Partial</div>
+            <div className="text-[10px] font-mono text-yellow-500 uppercase mb-1">Clearable</div>
             <div className="text-2xl text-yellow-500 font-mono">{stats.partial}</div>
           </div>
           <div>
@@ -57,9 +66,11 @@ export default function HomePage() {
         </div>
 
         {/* CTA */}
-        <div className="flex gap-4">
-          <Link href="/entities" className="btn-primary">View Entities</Link>
-          <Link href="/hp-std-001" className="btn-secondary">HP-STD-001</Link>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/entities" className="btn-primary">View Registry</Link>
+          <Link href="/sectors" className="btn-secondary">View Sector Profiles</Link>
+          <Link href="/hp-std-001" className="btn-secondary">Read HP-STD-001</Link>
+          <Link href="/api-docs" className="btn-secondary">Open API</Link>
         </div>
       </div>
     </div>

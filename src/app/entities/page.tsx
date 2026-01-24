@@ -13,12 +13,12 @@ function getBand(value: number): { label: string; color: string } {
   return { label: 'LOW', color: 'text-zinc-400' }
 }
 
-function getStatusLabel(status: string): string {
+function getStatusDisplay(status: string): string {
   switch (status) {
-    case 'SETTLED': return 'clearing active'
-    case 'PARTIAL': return 'cash mismatch recorded'
-    case 'OBSERVED': return 'loss vector active'
-    default: return 'losses accumulating'
+    case 'SETTLED': return 'Settled'
+    case 'PARTIAL': return 'Clearable'
+    case 'OBSERVED': return 'Observed'
+    default: return 'Non-Clearable'
   }
 }
 
@@ -43,8 +43,11 @@ export default function EntitiesPage() {
   return (
     <div className="pt-32 pb-20 px-6 md:px-12 min-h-screen max-w-[1800px] mx-auto animate-in">
       <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">
-        Exposure League Table <span className="text-zinc-500">(MEI / MLI / Δ24h)</span>
+        Public Registry
       </h1>
+      <p className="text-zinc-500 font-mono text-sm mb-6">
+        Real-time exposure state for all entities. MEI / MLI / Δ24h.
+      </p>
 
       {/* Scale */}
       <div className="font-mono text-xs text-zinc-500 mb-6">
@@ -92,7 +95,7 @@ export default function EntitiesPage() {
               <div className="hidden lg:grid grid-cols-12 gap-2 py-3 px-4 items-center font-mono text-sm">
                 <div className="col-span-2">
                   <div className="text-white font-bold">{actor.name}</div>
-                  <div className="text-zinc-600 text-[10px]">{getStatusLabel(actor.settlement_status || 'UNSETTLED')}</div>
+                  <div className="text-zinc-600 text-[10px]">{getStatusDisplay(actor.settlement_status || 'UNSETTLED')}</div>
                 </div>
                 <div className="col-span-1 text-zinc-400 text-xs">{actor.sector}</div>
                 <div className="col-span-1 text-center">
@@ -102,7 +105,7 @@ export default function EntitiesPage() {
                     actor.settlement_status === 'OBSERVED' ? 'bg-blue-900/30 text-blue-400' :
                     'bg-red-900/30 text-red-400'
                   }`}>
-                    {actor.settlement_status || 'UNSETTLED'}
+                    {getStatusDisplay(actor.settlement_status || 'UNSETTLED')}
                   </span>
                 </div>
                 <div className="col-span-1 text-right">
@@ -142,7 +145,7 @@ export default function EntitiesPage() {
                     actor.settlement_status === 'PARTIAL' ? 'bg-yellow-900/30 text-yellow-400' :
                     'bg-red-900/30 text-red-400'
                   }`}>
-                    {actor.settlement_status || 'UNSETTLED'}
+                    {getStatusDisplay(actor.settlement_status || 'UNSETTLED')}
                   </span>
                 </div>
                 <div className="text-zinc-500 text-xs font-mono mb-2">{actor.sector}</div>

@@ -2,8 +2,16 @@ import type { Metadata } from 'next'
 import { getAllNotices } from '@/lib/data'
 
 export const metadata: Metadata = {
-  title: 'Daily Public State Updates | HP-STD-001',
-  description: 'Chronological list of status transitions and state changes.',
+  title: 'State Updates | Public Ledger',
+  description: 'Chronological record of classification transitions and exposure changes.',
+}
+
+function getStatusDisplay(status: string): string {
+  switch (status) {
+    case 'SETTLED': return 'Settled'
+    case 'PARTIAL': return 'Clearable'
+    default: return 'Non-Clearable'
+  }
 }
 
 export default function NoticesPage() {
@@ -11,9 +19,12 @@ export default function NoticesPage() {
 
   return (
     <div className="pt-32 pb-24 px-6 md:px-12 max-w-[1200px] mx-auto animate-in">
-      <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-8">
-        Daily Public State Updates
+      <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">
+        State Updates
       </h1>
+      <p className="text-zinc-500 font-mono text-sm mb-8">
+        Public ledger of classification transitions.
+      </p>
 
       <div className="space-y-1">
         {notices.map((notice) => (
@@ -29,7 +40,7 @@ export default function NoticesPage() {
                 notice.status === 'PARTIAL' ? 'bg-yellow-900/30 text-yellow-400' :
                 'bg-red-900/30 text-red-400'
               }`}>
-                {notice.status}
+                {getStatusDisplay(notice.status)}
               </span>
               <span className="text-zinc-400">MEI:{notice.MEI}</span>
               <span className="text-red-400">Δ+{notice.ΔMEI_24h || 0}</span>
