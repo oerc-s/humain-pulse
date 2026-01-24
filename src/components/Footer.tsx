@@ -12,9 +12,9 @@ export function Footer() {
             <div className="font-mono text-[10px] text-zinc-600 uppercase tracking-widest">
               <span className="text-zinc-400">HP-STD-001</span> · MID · EI · M2M-SE · LCH · CSD
             </div>
-            <div className="font-mono text-[10px] text-zinc-600">
-              Last cycle: {LAST_PUBLISH_DATE}
-            </div>
+            <a href="mailto:clearing@humain-pulse.com" className="font-mono text-[10px] text-zinc-400 hover:text-white transition-colors">
+              clearing@humain-pulse.com
+            </a>
           </div>
         </div>
       </div>
