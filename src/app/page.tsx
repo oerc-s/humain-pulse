@@ -65,12 +65,18 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Warning */}
+        <div className="border border-red-900/50 bg-red-950/20 p-4 mb-8 max-w-xl">
+          <p className="text-red-400 font-mono text-sm">
+            Non-Clearable = Non-Settled. Capital remains exposed.
+          </p>
+        </div>
+
         {/* CTA */}
         <div className="flex flex-wrap gap-3">
           <Link href="/entities" className="btn-primary">View Registry</Link>
-          <Link href="/sectors" className="btn-secondary">View Sector Profiles</Link>
-          <Link href="/hp-std-001" className="btn-secondary">Read HP-STD-001</Link>
-          <Link href="/api-docs" className="btn-secondary">Open API</Link>
+          <Link href="/sectors" className="btn-secondary">Sector Profiles</Link>
+          <Link href="/hp-std-001" className="btn-secondary">HP-STD-001</Link>
         </div>
       </div>
     </div>

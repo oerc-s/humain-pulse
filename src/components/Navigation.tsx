@@ -4,11 +4,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const navItems = [
-  { href: '/entities', label: 'Entities' },
+  { href: '/entities', label: 'Registry' },
   { href: '/sectors', label: 'Sectors' },
   { href: '/hp-std-001', label: 'HP-STD-001' },
   { href: '/notices', label: 'Notices' },
-  { href: '/api-docs', label: 'API' },
 ]
 
 export function Navigation() {
@@ -44,7 +43,7 @@ export function Navigation() {
           href="/entities"
           className="border border-white/20 bg-white/5 text-white px-4 py-2 font-mono text-[10px] uppercase tracking-widest hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all active:scale-95"
         >
-          View Entities
+          View Registry
         </Link>
       </div>
     </nav>

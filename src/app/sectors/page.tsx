@@ -33,7 +33,7 @@ const sectors = [
   {
     layer: 'Actuation',
     items: [
-      { name: 'Robotics', weight: 1.0, chokepoint: 'MID + CSD missing → Observed' },
+      { name: 'Robotics', weight: 1.0, chokepoint: 'MID + CSD missing → Non-Clearable' },
     ]
   },
 ]

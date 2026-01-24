@@ -179,45 +179,26 @@ export default function EntityPage({ params }: Props) {
       </div>
 
       {/* Exposure State */}
-      <div className="border border-white/10 bg-zinc-900/20 p-6 mb-8">
-        <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mb-4">
-          Exposure State
+      {actor.status === 'UNSETTLED' && (
+        <div className="border border-red-900/50 bg-red-950/20 p-6 mb-8">
+          <p className="text-red-400 font-mono text-sm mb-2">
+            Exposure accrues. Clearing unavailable.
+          </p>
+          <p className="text-zinc-500 font-mono text-xs">
+            {actor.primitives.MID ? 'MID ✓' : 'MID ✗'} · {actor.primitives.M2M_SE ? 'M2M-SE ✓' : 'M2M-SE ✗'}
+          </p>
         </div>
-        {actor.status === 'SETTLED' ? (
-          <p className="text-emerald-400 font-mono text-sm">
-            Settled. Exposure cleared.
-          </p>
-        ) : actor.status === 'PARTIAL' ? (
-          <p className="text-yellow-400 font-mono text-sm">
-            Clearable. Settlement available when primitives complete.
-          </p>
-        ) : (
-          <>
-            <p className="text-zinc-300 font-mono text-sm mb-2">
-              Exposure accrues.
-            </p>
-            <p className="text-red-400 font-mono text-sm">
-              Clearing unavailable.
-            </p>
-          </>
-        )}
-      </div>
-
-      {/* Chokepoint Status */}
-      <div className="border border-white/10 bg-zinc-900/20 p-6 mb-8">
-        <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mb-4">
-          Chokepoint
+      )}
+      {actor.status === 'PARTIAL' && (
+        <div className="border border-yellow-900/50 bg-yellow-950/20 p-6 mb-8">
+          <p className="text-yellow-400 font-mono text-sm">Clearable.</p>
         </div>
-        {canClear ? (
-          <p className="text-emerald-400 font-mono text-sm">
-            MID ✓ + M2M-SE ✓ = Machine-native clearing possible.
-          </p>
-        ) : (
-          <p className="text-red-400 font-mono text-sm">
-            {actor.primitives.MID ? 'MID ✓' : 'MID ✗'} + {actor.primitives.M2M_SE ? 'M2M-SE ✓' : 'M2M-SE ✗'} = Non-Clearable. Clearing unavailable.
-          </p>
-        )}
-      </div>
+      )}
+      {actor.status === 'SETTLED' && (
+        <div className="border border-emerald-900/50 bg-emerald-950/20 p-6 mb-8">
+          <p className="text-emerald-400 font-mono text-sm">Settled.</p>
+        </div>
+      )}
 
       {/* Entity Info */}
       <div className="border-t border-white/10 pt-8 font-mono text-xs text-zinc-500">
