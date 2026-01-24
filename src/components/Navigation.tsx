@@ -39,12 +39,12 @@ export function Navigation() {
           ))}
         </div>
 
-        <Link
-          href="/entities"
-          className="border border-white/20 bg-white/5 text-white px-4 py-2 font-mono text-[10px] uppercase tracking-widest hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all active:scale-95"
+        <a
+          href="mailto:clearing@humain-pulse.com"
+          className="font-mono text-[10px] text-zinc-400 hover:text-white transition-colors"
         >
-          View Registry
-        </Link>
+          clearing@humain-pulse.com
+        </a>
       </div>
     </nav>
   )

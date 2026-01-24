@@ -73,18 +73,10 @@ export default function HomePage() {
         </div>
 
         {/* CTA */}
-        <div className="flex flex-wrap gap-3 mb-16">
+        <div className="flex flex-wrap gap-3">
           <Link href="/entities" className="btn-primary">View Registry</Link>
           <Link href="/sectors" className="btn-secondary">Sector Profiles</Link>
           <Link href="/hp-std-001" className="btn-secondary">HP-STD-001</Link>
-        </div>
-
-        {/* Certification */}
-        <div className="border-t border-white/10 pt-8">
-          <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mb-2">Certification</div>
-          <a href="mailto:clearing@humain-pulse.com" className="font-mono text-sm text-white hover:text-emerald-400 transition-colors">
-            clearing@humain-pulse.com
-          </a>
         </div>
       </div>
     </div>
