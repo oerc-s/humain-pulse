@@ -1,103 +1,67 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import { ACTORS } from '@/lib/data'
 
 export const metadata: Metadata = {
-  title: 'Sectors | HP-STD-001',
-  description: 'Machine exposure by sector. Four layers: Capital, Compute, Intelligence, Actuation.',
-  keywords: ['sectors', 'HP-STD-001', 'Capital', 'Compute', 'Intelligence', 'Actuation'],
+  title: 'Sector Scoring Profiles | HP-STD-001',
+  description: 'Sector weights and chokepoints for machine-native clearing.',
 }
 
-const layers = [
+const sectors = [
   {
     layer: 'Capital',
-    sectors: [
-      { name: 'Reinsurance', chokepoint: 'MID + M2M-SE', breaks: 'Loss reserves cannot clear without machine identity' },
-      { name: 'Brokers', chokepoint: 'MID + M2M-SE', breaks: 'Placement data unverifiable without settlement endpoint' },
-      { name: 'Ratings', chokepoint: 'MID + EI', breaks: 'Exposure models fail without machine exposure index' },
-      { name: 'ILS / Capital Markets', chokepoint: 'MID + LCH', breaks: 'Tranches unattributable without liability chain' },
-      { name: 'Funds / Allocators', chokepoint: 'MID + EI', breaks: 'Portfolio exposure unquantified' },
+    items: [
+      { name: 'Reinsurance', weight: 1.0, chokepoint: 'MID + M2M-SE missing → UNSETTLED' },
+      { name: 'Brokers', weight: 0.8, chokepoint: 'M2M-SE missing → PARTIAL' },
+      { name: 'Ratings', weight: 0.6, chokepoint: 'EI missing → PARTIAL' },
+      { name: 'ILS / Capital Markets', weight: 0.9, chokepoint: 'LCH missing → PARTIAL' },
+      { name: 'Funds / Allocators', weight: 0.7, chokepoint: 'EI missing → PARTIAL' },
     ]
   },
   {
     layer: 'Compute',
-    sectors: [
-      { name: 'Cloud Providers', chokepoint: 'MID + M2M-SE', breaks: 'Workload liability uncleared' },
-      { name: 'Integrators', chokepoint: 'MID + CSD', breaks: 'Control surfaces undefined' },
+    items: [
+      { name: 'Cloud Providers', weight: 1.0, chokepoint: 'MID + M2M-SE missing → UNSETTLED' },
+      { name: 'Integrators', weight: 0.7, chokepoint: 'CSD missing → PARTIAL' },
     ]
   },
   {
     layer: 'Intelligence',
-    sectors: [
-      { name: 'AI Labs', chokepoint: 'MID + M2M-SE', breaks: 'Model deployment exposure uncleared' },
-      { name: 'Auditors', chokepoint: 'MID + LCH', breaks: 'Attestation chain broken' },
+    items: [
+      { name: 'AI Labs', weight: 1.0, chokepoint: 'MID + M2M-SE missing → UNSETTLED' },
+      { name: 'Auditors', weight: 0.6, chokepoint: 'LCH missing → PARTIAL' },
     ]
   },
   {
     layer: 'Actuation',
-    sectors: [
-      { name: 'Robotics / Actuation', chokepoint: 'MID + CSD', breaks: 'Physical autonomy uncontrolled' },
+    items: [
+      { name: 'Robotics', weight: 1.0, chokepoint: 'MID + CSD missing → OBSERVED' },
     ]
   },
 ]
 
 export default function SectorsPage() {
-  // Count entities per layer
-  const layerCounts = {
-    Capital: ACTORS.filter(a => a.layer === 'Capital').length,
-    Compute: ACTORS.filter(a => a.layer === 'Compute').length,
-    Intelligence: ACTORS.filter(a => a.layer === 'Intelligence').length,
-    Actuation: ACTORS.filter(a => a.layer === 'Actuation').length,
-  }
-
   return (
-    <div className="pt-32 pb-24 px-6 md:px-12 max-w-[1400px] mx-auto animate-in">
-      <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">Sectors</h1>
-      <p className="text-zinc-500 font-mono text-sm mb-12">
-        Four layers. Each sector has a chokepoint. No MID + no M2M-SE = UNSETTLED.
-      </p>
+    <div className="pt-32 pb-24 px-6 md:px-12 max-w-[1200px] mx-auto animate-in">
+      <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-8">
+        Sector Scoring Profiles
+      </h1>
 
-      {/* Layers */}
-      <div className="space-y-12">
-        {layers.map(({ layer, sectors }) => (
-          <div key={layer}>
-            <div className="flex items-center gap-4 mb-6 border-b border-white/10 pb-4">
-              <h2 className="text-xl text-white font-medium uppercase">{layer}</h2>
-              <span className="text-zinc-500 font-mono text-sm">{layerCounts[layer as keyof typeof layerCounts]} entities</span>
+      <div className="space-y-8">
+        {sectors.map(({ layer, items }) => (
+          <div key={layer} className="border border-white/10 bg-zinc-900/20">
+            <div className="p-4 border-b border-white/10 bg-zinc-900/30">
+              <span className="text-white font-mono font-bold uppercase">{layer}</span>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {sectors.map((sector) => (
-                <Link
-                  key={sector.name}
-                  href={`/entities?sector=${encodeURIComponent(sector.name)}`}
-                  className="border border-white/10 bg-zinc-900/20 p-6 hover:border-white/30 transition-colors"
-                >
-                  <div className="text-white font-bold mb-3">{sector.name}</div>
-                  <div className="space-y-2 font-mono text-xs">
-                    <div className="flex items-start gap-2">
-                      <span className="text-emerald-500">Chokepoint:</span>
-                      <span className="text-zinc-300">{sector.chokepoint}</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <span className="text-red-500">State:</span>
-                      <span className="text-zinc-400">UNSETTLED = losses accumulating</span>
-                    </div>
-                    <div className="text-zinc-500 mt-2">{sector.breaks}</div>
-                  </div>
-                </Link>
+            <div className="divide-y divide-white/10">
+              {items.map((sector) => (
+                <div key={sector.name} className="p-4 grid grid-cols-3 gap-4 font-mono text-sm">
+                  <div className="text-white">{sector.name}</div>
+                  <div className="text-zinc-400">Weight: {sector.weight}</div>
+                  <div className="text-red-400 text-xs">{sector.chokepoint}</div>
+                </div>
               ))}
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Rule */}
-      <div className="border border-white/10 bg-zinc-900/20 p-6 mt-12">
-        <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mb-4">Rule</div>
-        <p className="text-red-400 font-mono text-sm">
-          No MID + no M2M-SE = UNSETTLED. Losses accumulating.
-        </p>
       </div>
 
       <div className="mt-8 text-[10px] font-mono text-zinc-600">
