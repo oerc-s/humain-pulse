@@ -10,9 +10,8 @@ export default function HomePage() {
       <div className="max-w-[1800px] mx-auto min-h-[80vh] flex flex-col justify-start">
 
         {/* HERO */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tighter text-white mb-8 uppercase leading-[0.9] max-w-4xl">
-          Exposure accrues.<br />
-          <span className="text-emerald-500">Settlement closes it.</span>
+        <h1 className="text-3xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-white mb-8 uppercase leading-[0.9] max-w-4xl">
+          HUMAIN PULSE <span className="text-zinc-500">=</span> <span className="text-emerald-500">Machine-Native Risk Clearing Operator</span>
         </h1>
 
         {/* 3 Bullets */}
