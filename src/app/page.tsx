@@ -13,8 +13,11 @@ export default function HomePage() {
           Humain Pulse — Machine-Native Clearing Operator
         </h1>
 
-        <p className="text-zinc-400 font-mono text-sm mb-12 max-w-2xl">
-          Machine risk cannot be insured without machine-native clearing. Losses are already occurring.
+        <p className="text-zinc-400 font-mono text-sm mb-4 max-w-2xl">
+          Market infrastructure for machine-native risk clearing.
+        </p>
+        <p className="text-zinc-500 font-mono text-xs mb-12 max-w-2xl">
+          Autonomous systems risk is Non-Clearable by default unless attested under HP-STD-001.
         </p>
 
         {/* 3 Bullets */}
