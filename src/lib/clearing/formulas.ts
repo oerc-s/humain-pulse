@@ -44,6 +44,15 @@ export function calculateMLI(primitives: ClearingPrimitives): number {
 }
 
 /**
+ * Calculate MLI from raw scores (0-4 each)
+ * MLI = sum of scores × 5, max 100
+ */
+export function calculateMLIFromScores(scores: { MID: number; EI: number; M2M_SE: number; LCH: number; CSD: number }): number {
+  const sum = scores.MID + scores.EI + scores.M2M_SE + scores.LCH + scores.CSD
+  return Math.min(sum * 5, 100)
+}
+
+/**
  * Derive clearing status from MLI
  * MLI < 40  → UNSETTLED
  * 40 ≤ MLI < 80 → PARTIAL
@@ -61,17 +70,17 @@ export function deriveStatus(mli: number): ClearingStatus {
 /**
  * Calculate full exposure for an actor
  *
- * @param primitives - Actor's primitive states
+ * @param scores - Actor's primitive scores
  * @param factors - MEI calculation factors
  * @returns Complete exposure calculation
  */
 export function calculateExposure(
-  primitives: ClearingPrimitives,
+  scores: { MID: number; EI: number; M2M_SE: number; LCH: number; CSD: number },
   factors: ClearingMEIFactors
 ): ClearingExposure {
   return {
     MEI: calculateMEI(factors),
-    MLI: calculateMLI(primitives)
+    MLI: calculateMLIFromScores(scores)
   }
 }
 

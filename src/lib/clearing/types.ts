@@ -15,6 +15,15 @@ export interface ClearingPrimitives {
   CSD: boolean      // Control Surface Definition
 }
 
+// Primitive scores (0-4) for MLI calculation
+export interface PrimitiveScores {
+  MID: number
+  EI: number
+  M2M_SE: number
+  LCH: number
+  CSD: number
+}
+
 // MEI factors for clearing calculations
 export interface ClearingMEIFactors {
   automation_observed: boolean
@@ -31,6 +40,7 @@ export interface ClearingActor {
   sector: string
   status: ClearingStatus
   primitives: ClearingPrimitives
+  primitive_scores: PrimitiveScores
   mei_factors: ClearingMEIFactors
   last_settlement: string | null
   created_at: string

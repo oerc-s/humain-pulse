@@ -13,7 +13,7 @@ import type {
 } from './types'
 import {
   calculateMEI,
-  calculateMLI,
+  calculateMLIFromScores,
   deriveStatus,
   canSettle,
   updateTimeFactors
@@ -57,7 +57,7 @@ export function recalculateActor(actorId: string): ClearingEvent | null {
   if (!actor) return null
 
   // Calculate current values
-  const currentMLI = calculateMLI(actor.primitives)
+  const currentMLI = calculateMLIFromScores(actor.primitive_scores)
   const currentMEI = calculateMEI(actor.mei_factors)
   const currentStatus = actor.status
 
@@ -137,7 +137,7 @@ export function updatePrimitives(
   if (!actor) return null
 
   // Calculate current values
-  const currentMLI = calculateMLI(actor.primitives)
+  const currentMLI = calculateMLIFromScores(actor.primitive_scores)
   const currentMEI = calculateMEI(actor.mei_factors)
   const currentStatus = actor.status
 
@@ -148,7 +148,7 @@ export function updatePrimitives(
   }
 
   // Calculate new values
-  const newMLI = calculateMLI(newPrimitives)
+  const newMLI = currentMLI // MLI based on scores, not boolean primitives
   const newMEI = currentMEI // MEI doesn't change from primitives alone
   const newStatus = deriveStatus(newMLI)
 
@@ -193,7 +193,7 @@ export function executeSettlement(actorId: string): SettlementResponse {
   }
 
   // Calculate current values
-  const currentMLI = calculateMLI(actor.primitives)
+  const currentMLI = calculateMLIFromScores(actor.primitive_scores)
   const currentMEI = calculateMEI(actor.mei_factors)
   const currentStatus = actor.status
 
@@ -272,7 +272,7 @@ export function getActorWithExposure(actorId: string): ClearingActorWithExposure
     actor,
     exposure: {
       MEI: calculateMEI(actor.mei_factors),
-      MLI: calculateMLI(actor.primitives)
+      MLI: calculateMLIFromScores(actor.primitive_scores)
     }
   }
 }

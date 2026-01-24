@@ -3,7 +3,7 @@
  * Transform existing actors to clearing model
  */
 
-import type { ClearingActor, ClearingPrimitives, ClearingMEIFactors, ClearingStatus } from './types'
+import type { ClearingActor, ClearingPrimitives, PrimitiveScores, ClearingMEIFactors, ClearingStatus } from './types'
 import { ACTORS } from '../data'
 import { REINSURANCE_ACTORS, type ReinsuranceActor, type PrimitiveState } from '../reinsurance-data'
 
@@ -62,6 +62,14 @@ function transformGeneralActor(actor: (typeof ACTORS)[0], index: number): Cleari
     CSD: scoreToBoolean(actor.primitives.CSD.score)
   }
 
+  const primitive_scores: PrimitiveScores = {
+    MID: actor.primitives.MID.score,
+    EI: actor.primitives.EI.score,
+    M2M_SE: actor.primitives.M2M_SE.score,
+    LCH: actor.primitives.LCH.score,
+    CSD: actor.primitives.CSD.score
+  }
+
   // Derive MEI factors from existing data
   const mei_factors: ClearingMEIFactors = {
     automation_observed: actor.scores.MEI > 100,
@@ -77,6 +85,7 @@ function transformGeneralActor(actor: (typeof ACTORS)[0], index: number): Cleari
     sector: actor.sector,
     status: transformConformanceStatus(actor.status),
     primitives,
+    primitive_scores,
     mei_factors,
     last_settlement: null,
     created_at: new Date().toISOString()
@@ -95,8 +104,16 @@ function transformReinsuranceActor(actor: ReinsuranceActor, index: number): Clea
     CSD: stateToBoolean(actor.primitives.CSD.state)
   }
 
+  // Reinsurance actors use PUBLISHED/NOT_PUBLISHED, convert to scores (4 or 0)
+  const primitive_scores: PrimitiveScores = {
+    MID: stateToBoolean(actor.primitives.MID.state) ? 4 : 0,
+    EI: stateToBoolean(actor.primitives.EI.state) ? 4 : 0,
+    M2M_SE: stateToBoolean(actor.primitives['M2M-SE'].state) ? 4 : 0,
+    LCH: stateToBoolean(actor.primitives.LCH.state) ? 4 : 0,
+    CSD: stateToBoolean(actor.primitives.CSD.state) ? 4 : 0
+  }
+
   // Derive MEI factors from reinsurance factors
-  const totalFactors = actor.factors.CAP + actor.factors.PORT + actor.factors.SPEED + actor.factors.DEP + actor.factors.GATE
   const mei_factors: ClearingMEIFactors = {
     automation_observed: actor.factors.GATE < 3, // Low gate = more automation
     number_of_agents: Math.max(1, actor.factors.CAP * 10),
@@ -111,6 +128,7 @@ function transformReinsuranceActor(actor: ReinsuranceActor, index: number): Clea
     sector: 'Reinsurance',
     status: transformConformanceStatus(actor.status),
     primitives,
+    primitive_scores,
     mei_factors,
     last_settlement: null,
     created_at: new Date().toISOString()

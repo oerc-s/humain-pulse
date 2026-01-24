@@ -53,7 +53,7 @@ export function isInitialized(): boolean {
 export function getAllActors(): ClearingActorWithExposure[] {
   return Array.from(actors.values()).map(actor => ({
     actor,
-    exposure: calculateExposure(actor.primitives, actor.mei_factors)
+    exposure: calculateExposure(actor.primitive_scores, actor.mei_factors)
   }))
 }
 
@@ -73,7 +73,7 @@ export function getActorWithExposure(actorId: string): ClearingActorWithExposure
 
   return {
     actor,
-    exposure: calculateExposure(actor.primitives, actor.mei_factors)
+    exposure: calculateExposure(actor.primitive_scores, actor.mei_factors)
   }
 }
 
