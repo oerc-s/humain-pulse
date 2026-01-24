@@ -7,7 +7,7 @@ const navItems = [
   { href: '/entities', label: 'Registry' },
   { href: '/sectors', label: 'Sectors' },
   { href: '/hp-std-001', label: 'HP-STD-001' },
-  { href: '/notices', label: 'Notices' },
+  { href: '/certification', label: 'Certification' },
 ]
 
 export function Navigation() {
