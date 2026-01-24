@@ -10,9 +10,12 @@ export default function HomePage() {
       <div className="max-w-[1800px] mx-auto min-h-[80vh] flex flex-col justify-start">
 
         {/* HERO */}
-        <h1 className="text-3xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-white mb-8 uppercase leading-[0.9] max-w-4xl">
-          HUMAIN PULSE <span className="text-zinc-500">=</span> <span className="text-emerald-500">Machine-Native Risk Clearing Operator</span>
+        <h1 className="text-3xl md:text-5xl lg:text-6xl font-medium tracking-tighter text-white mb-4 uppercase leading-[0.9] max-w-4xl">
+          MACHINE-NATIVE CLEARING <span className="text-zinc-500">—</span> <span className="text-emerald-500">PUBLIC STATUS</span>
         </h1>
+        <p className="text-zinc-400 font-mono text-sm mb-8 max-w-xl">
+          Exposure states update daily. Settlement readiness is public. Loss is an accounting state.
+        </p>
 
         {/* 3 Bullets */}
         <div className="space-y-3 font-mono text-sm text-zinc-400 mb-12 max-w-xl">
@@ -59,11 +62,11 @@ export default function HomePage() {
 
         {/* CTA */}
         <div className="flex flex-wrap gap-6 mb-24">
-          <Link href="/actors" className="btn-primary">
-            View Entities
+          <Link href="/league-table" className="btn-primary">
+            View League Table
           </Link>
-          <Link href="/notices" className="btn-secondary">
-            View Notices
+          <Link href="/status" className="btn-secondary">
+            View Status
           </Link>
         </div>
 
