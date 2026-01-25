@@ -96,14 +96,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} style={{ backgroundColor: '#000' }}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-black text-white selection:bg-white selection:text-black font-sans antialiased">
+      <body className="min-h-screen flex flex-col bg-black text-white selection:bg-white selection:text-black font-sans antialiased" style={{ backgroundColor: '#000', color: '#fff', minHeight: '100vh' }}>
         <div className="fixed inset-0 pointer-events-none z-0 bg-noise opacity-[0.03] mix-blend-overlay" />
         <Navigation />
         <main className="flex-grow w-full">
