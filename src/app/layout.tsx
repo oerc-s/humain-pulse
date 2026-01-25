@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import { Navigation } from '@/components/Navigation'
 import { Footer } from '@/components/Footer'
@@ -17,6 +17,12 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 const BASE_URL = 'https://humain-pulse.com'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+}
 
 export const metadata: Metadata = {
   title: {
@@ -98,7 +104,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col bg-black text-white selection:bg-white selection:text-black font-sans antialiased">
-        <div className="fixed inset-0 pointer-events-none z-50 bg-noise opacity-[0.03] mix-blend-overlay" />
+        <div className="fixed inset-0 pointer-events-none z-0 bg-noise opacity-[0.03] mix-blend-overlay" />
         <Navigation />
         <main className="flex-grow w-full">
           {children}

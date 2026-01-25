@@ -46,7 +46,7 @@ export default function HomePage() {
         </div>
 
         {/* Live Stats */}
-        <div className="grid grid-cols-4 gap-4 mb-12 border border-white/10 p-6 bg-zinc-900/20 max-w-xl">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 border border-white/10 p-6 bg-zinc-900/20 max-w-xl">
           <div>
             <div className="text-[10px] font-mono text-zinc-500 uppercase mb-1">Total</div>
             <div className="text-2xl text-white font-mono">{stats.total}</div>
