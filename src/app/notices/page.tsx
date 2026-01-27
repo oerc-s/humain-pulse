@@ -1,60 +1,86 @@
-import type { Metadata } from 'next'
-import { getAllNotices } from '@/lib/data'
-
-export const metadata: Metadata = {
-  title: 'State Updates | Public Ledger',
-  description: 'Chronological record of classification transitions and exposure changes.',
-}
-
-function getStatusDisplay(status: string): string {
-  switch (status) {
-    case 'SETTLED': return 'Settled'
-    case 'PARTIAL': return 'Clearable'
-    default: return 'Non-Clearable'
-  }
-}
+import Link from 'next/link'
+import { computeAllActors } from '@/lib/clearing/engine'
 
 export default function NoticesPage() {
-  const notices = getAllNotices()
+  const actors = computeAllActors()
+  const today = new Date().toISOString().split('T')[0]
 
   return (
-    <div className="pt-32 pb-24 px-6 md:px-12 max-w-[1200px] mx-auto animate-in">
-      <h1 className="text-3xl text-white font-medium uppercase tracking-tight mb-2">
-        State Updates
-      </h1>
-      <p className="text-zinc-500 font-mono text-sm mb-8">
-        Public ledger of classification transitions.
-      </p>
+    <div className="pt-24 px-6 md:px-12">
+      <div className="max-w-[900px] mx-auto">
 
-      <div className="space-y-1">
-        {notices.map((notice) => (
-          <div
-            key={notice.id}
-            className="border border-zinc-800/50 bg-zinc-900/20 p-4 font-mono text-sm"
-          >
-            <div className="flex items-center gap-4 flex-wrap">
-              <span className="text-zinc-500">{notice.date}</span>
-              <span className="text-white font-bold">{notice.actor_name}</span>
-              <span className={`text-[10px] uppercase px-2 py-1 ${
-                notice.status === 'SETTLED' ? 'bg-emerald-900/30 text-emerald-400' :
-                notice.status === 'PARTIAL' ? 'bg-yellow-900/30 text-yellow-400' :
-                'bg-red-900/30 text-red-400'
-              }`}>
-                {getStatusDisplay(notice.status)}
-              </span>
-              <span className="text-zinc-400">MEI:{notice.MEI}</span>
-              <span className="text-red-400">Δ+{notice.ΔMEI_24h || 0}</span>
-            </div>
+        <h1 className="text-xl md:text-2xl font-medium tracking-tight text-white uppercase mb-4">
+          Notices
+        </h1>
+
+        <p className="font-mono text-xs text-zinc-600 mb-8">
+          Loss is already occurring. This is an accounting state.
+        </p>
+
+        {/* Current state notice */}
+        <div className="border border-white/10 p-6 mb-8">
+          <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mb-4">
+            {today} — Accounting State
           </div>
-        ))}
-      </div>
+          <div className="space-y-3">
+            <p className="font-mono text-sm text-zinc-400">
+              {actors.filter(a => a.state === 'Non-Clearable').length} actors classified Non-Clearable.
+            </p>
+            <p className="font-mono text-sm text-zinc-400">
+              {actors.filter(a => a.state === 'Clearable').length} actors classified Clearable.
+            </p>
+            <p className="font-mono text-sm text-zinc-400">
+              {actors.filter(a => a.state === 'Settled').length} actors classified Settled.
+            </p>
+          </div>
+        </div>
 
-      {notices.length === 0 && (
-        <div className="text-zinc-500 font-mono">No state updates.</div>
-      )}
+        {/* Accounting statements */}
+        <div className="space-y-4 mb-12">
+          <div className="border-l-2 border-zinc-700 pl-4">
+            <p className="font-mono text-sm text-white">
+              Losses are accumulating.
+            </p>
+            <p className="font-mono text-xs text-zinc-600 mt-1">
+              Counterparties absorbing unresolved exposure.
+            </p>
+          </div>
 
-      <div className="mt-8 text-[10px] font-mono text-zinc-600">
-        {notices.length} updates · HP-STD-001 v1.10
+          <div className="border-l-2 border-zinc-700 pl-4">
+            <p className="font-mono text-sm text-white">
+              Cash mismatch recorded.
+            </p>
+            <p className="font-mono text-xs text-zinc-600 mt-1">
+              Placement degrades mechanically.
+            </p>
+          </div>
+
+          <div className="border-l-2 border-zinc-700 pl-4">
+            <p className="font-mono text-sm text-white">
+              Non-clearable by default until proven otherwise.
+            </p>
+            <p className="font-mono text-xs text-zinc-600 mt-1">
+              Status changes only on attestation.
+            </p>
+          </div>
+        </div>
+
+        {/* HP-STD-001 reference */}
+        <div className="border border-white/5 p-4 mb-8 bg-zinc-900/10">
+          <div className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mb-2">
+            Reference
+          </div>
+          <p className="font-mono text-xs text-zinc-600">
+            HP-STD-001 defines settlement primitives: MID, M2M-SE, LCH, CSD.
+            Attestation of all four primitives transitions state to Settled.
+          </p>
+        </div>
+
+        <div className="mt-8">
+          <Link href="/" className="font-mono text-xs text-zinc-500 hover:text-white transition-colors">
+            ← Back
+          </Link>
+        </div>
       </div>
     </div>
   )

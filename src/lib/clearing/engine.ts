@@ -1,286 +1,139 @@
 /**
- * Clearing Engine Core
- * Recalculation, primitive updates, and settlement execution
+ * Humain Pulse — Machine-Native Clearing Operator
+ * Engine (EXACT SPEC)
  */
 
-import type {
-  ClearingActor,
-  ClearingActorWithExposure,
-  ClearingEvent,
-  ClearingPrimitives,
-  SettlementResponse,
-  RecalculationResponse
-} from './types'
+import type { ActorInput, ActorOutput, Registry } from './types'
 import {
-  calculateMEI,
-  calculateMLIFromScores,
-  deriveStatus,
-  canSettle,
-  updateTimeFactors
+  computeSubscores,
+  computeMEI,
+  computeMLI,
+  deriveState,
+  computeDelta24h,
 } from './formulas'
-import {
-  CLEARING_NOTES,
-  getRecalculationNote,
-  getSettlementNote,
-  getSettlementCompleteNote,
-  getPrimitiveUpdateNote
-} from './language'
-import {
-  getAllActors,
-  getActor,
-  updateActor,
-  appendEvent,
-  setLastRecalculation,
-  initializeState,
-  isInitialized
-} from './state'
-import { transformAllActors } from './transform'
+import { ACTORS } from './data'
+
+// In-memory store for yesterday's MEI values
+let yesterdayMEI: Record<string, number> = {}
 
 /**
- * Ensure engine is initialized
+ * Compute a single actor's output
  */
-export function ensureInitialized(): void {
-  if (!isInitialized()) {
-    const actors = transformAllActors()
-    initializeState(actors)
-  }
-}
-
-/**
- * Recalculate a single actor's exposure and status
- * Returns event if state changed
- */
-export function recalculateActor(actorId: string): ClearingEvent | null {
-  ensureInitialized()
-
-  const actor = getActor(actorId)
-  if (!actor) return null
-
-  // Calculate current values
-  const currentMLI = calculateMLIFromScores(actor.primitive_scores)
-  const currentMEI = calculateMEI(actor.mei_factors)
-  const currentStatus = actor.status
-
-  // Update time factors
-  const updatedFactors = updateTimeFactors(actor.mei_factors, actor.last_settlement)
-  const newMEI = calculateMEI(updatedFactors)
-  const newMLI = currentMLI // MLI doesn't change from time alone
-  const newStatus = deriveStatus(newMLI)
-
-  // Check if anything changed
-  const meiChanged = Math.abs(newMEI - currentMEI) > 0.01
-  const statusChanged = newStatus !== currentStatus
-
-  if (!meiChanged && !statusChanged) {
-    return null // No change, no event
-  }
-
-  // Update actor
-  const updatedActor: ClearingActor = {
-    ...actor,
-    mei_factors: updatedFactors,
-    status: newStatus
-  }
-  updateActor(updatedActor)
-
-  // Create event
-  const event = appendEvent({
-    actor_id: actorId,
-    event_type: statusChanged ? 'STATUS_CHANGE' : 'RECALCULATION',
-    note: getRecalculationNote(meiChanged),
-    mei_before: currentMEI,
-    mei_after: newMEI,
-    mli_before: currentMLI,
-    mli_after: newMLI,
-    status_before: currentStatus,
-    status_after: newStatus
-  })
-
-  return event
-}
-
-/**
- * Recalculate all actors
- * Returns summary of changes
- */
-export function recalculateAll(): RecalculationResponse {
-  ensureInitialized()
-
-  const allActors = getAllActors()
-  let eventsCreated = 0
-
-  for (const { actor } of allActors) {
-    const event = recalculateActor(actor.actor_id)
-    if (event) eventsCreated++
-  }
-
-  const timestamp = new Date().toISOString()
-  setLastRecalculation(timestamp)
+export function computeActor(input: ActorInput, prevMEI: number | null = null): ActorOutput {
+  const MEI = computeMEI(input.sector, input.primitives)
+  const MLI = computeMLI(input.sector, input.primitives)
+  const state = deriveState(input.primitives)
+  const subscores = computeSubscores(input.sector, input.primitives)
+  const delta_24h = computeDelta24h(MEI, prevMEI)
 
   return {
-    recalculated: allActors.length,
-    events_created: eventsCreated,
-    timestamp
+    actor_id: input.actor_id,
+    actor_name: input.actor_name,
+    slug: input.slug,
+    sector: input.sector,
+    state,
+    MEI,
+    MLI,
+    delta_24h,
+    subscores,
+    primitives: input.primitives,
+    proofs: input.proofs,
+    last_updated_utc: new Date().toISOString(),
   }
 }
 
 /**
- * Update primitives for an actor
+ * Compute all actors
  */
-export function updatePrimitives(
-  actorId: string,
-  primitiveUpdates: Partial<ClearingPrimitives>
-): ClearingEvent | null {
-  ensureInitialized()
-
-  const actor = getActor(actorId)
-  if (!actor) return null
-
-  // Calculate current values
-  const currentMLI = calculateMLIFromScores(actor.primitive_scores)
-  const currentMEI = calculateMEI(actor.mei_factors)
-  const currentStatus = actor.status
-
-  // Apply updates
-  const newPrimitives: ClearingPrimitives = {
-    ...actor.primitives,
-    ...primitiveUpdates
-  }
-
-  // Calculate new values
-  const newMLI = currentMLI // MLI based on scores, not boolean primitives
-  const newMEI = currentMEI // MEI doesn't change from primitives alone
-  const newStatus = deriveStatus(newMLI)
-
-  // Update actor
-  const updatedActor: ClearingActor = {
-    ...actor,
-    primitives: newPrimitives,
-    status: newStatus
-  }
-  updateActor(updatedActor)
-
-  // Create event
-  const event = appendEvent({
-    actor_id: actorId,
-    event_type: 'PRIMITIVE_UPDATE',
-    note: getPrimitiveUpdateNote(),
-    mei_before: currentMEI,
-    mei_after: newMEI,
-    mli_before: currentMLI,
-    mli_after: newMLI,
-    status_before: currentStatus,
-    status_after: newStatus
+export function computeAllActors(): ActorOutput[] {
+  return ACTORS.map((input) => {
+    const prevMEI = yesterdayMEI[input.slug] ?? null
+    return computeActor(input, prevMEI)
   })
-
-  return event
 }
 
 /**
- * Execute settlement for an actor
- * Resets MEI to 0 if MLI >= 80
+ * Generate registry
  */
-export function executeSettlement(actorId: string): SettlementResponse {
-  ensureInitialized()
-
-  const actor = getActor(actorId)
-  if (!actor) {
-    return {
-      success: false,
-      actor_id: actorId,
-      note: CLEARING_NOTES.CLEARING_UNAVAILABLE
-    }
-  }
-
-  // Calculate current values
-  const currentMLI = calculateMLIFromScores(actor.primitive_scores)
-  const currentMEI = calculateMEI(actor.mei_factors)
-  const currentStatus = actor.status
-
-  // Check if settlement is allowed
-  if (!canSettle(currentMLI)) {
-    // Log the blocked attempt
-    const blockedEvent = appendEvent({
-      actor_id: actorId,
-      event_type: 'SETTLEMENT_BLOCKED',
-      note: CLEARING_NOTES.CLEARING_UNAVAILABLE,
-      mei_before: currentMEI,
-      mei_after: currentMEI,
-      mli_before: currentMLI,
-      mli_after: currentMLI,
-      status_before: currentStatus,
-      status_after: currentStatus
-    })
-
-    return {
-      success: false,
-      actor_id: actorId,
-      note: CLEARING_NOTES.CLEARING_UNAVAILABLE,
-      event: blockedEvent
-    }
-  }
-
-  // Execute settlement - reset MEI factors
-  const settledTimestamp = new Date().toISOString()
-  const newFactors = {
-    ...actor.mei_factors,
-    hours_since_last_settlement: 0
-  }
-  const newMEI = calculateMEI(newFactors)
-  const newStatus = deriveStatus(currentMLI) // Status based on MLI
-
-  // Update actor
-  const updatedActor: ClearingActor = {
-    ...actor,
-    mei_factors: newFactors,
-    status: newStatus,
-    last_settlement: settledTimestamp
-  }
-  updateActor(updatedActor)
-
-  // Create success event
-  const event = appendEvent({
-    actor_id: actorId,
-    event_type: 'SETTLEMENT_SUCCESS',
-    note: getSettlementCompleteNote(),
-    mei_before: currentMEI,
-    mei_after: newMEI,
-    mli_before: currentMLI,
-    mli_after: currentMLI,
-    status_before: currentStatus,
-    status_after: newStatus
-  })
+export function generateRegistry(): Registry {
+  const actors = computeAllActors()
+  // Sort by MEI descending
+  actors.sort((a, b) => b.MEI - a.MEI)
 
   return {
-    success: true,
-    actor_id: actorId,
-    note: getSettlementCompleteNote(),
-    event
+    actors,
+    generated_utc: new Date().toISOString(),
   }
 }
 
 /**
- * Get actor with exposure (convenience export)
+ * Get single actor by slug
  */
-export function getActorWithExposure(actorId: string): ClearingActorWithExposure | null {
-  ensureInitialized()
+export function getActorBySlug(slug: string): ActorOutput | null {
+  const input = ACTORS.find((a) => a.slug === slug)
+  if (!input) return null
 
-  const actor = getActor(actorId)
-  if (!actor) return null
+  const prevMEI = yesterdayMEI[slug] ?? null
+  return computeActor(input, prevMEI)
+}
+
+/**
+ * Store today's MEI as yesterday for tomorrow's delta calculation
+ */
+export function snapshotForTomorrow(): void {
+  const actors = computeAllActors()
+  yesterdayMEI = {}
+  for (const actor of actors) {
+    yesterdayMEI[actor.slug] = actor.MEI
+  }
+}
+
+/**
+ * Get summary stats
+ */
+export function getStats(): {
+  total: number
+  non_clearable: number
+  clearable: number
+  settled: number
+  avg_mei: number
+  avg_mli: number
+} {
+  const actors = computeAllActors()
+  const non_clearable = actors.filter((a) => a.state === 'Non-Clearable').length
+  const clearable = actors.filter((a) => a.state === 'Clearable').length
+  const settled = actors.filter((a) => a.state === 'Settled').length
+  const avg_mei = Math.round(actors.reduce((sum, a) => sum + a.MEI, 0) / actors.length)
+  const avg_mli = Math.round(actors.reduce((sum, a) => sum + a.MLI, 0) / actors.length)
 
   return {
-    actor,
-    exposure: {
-      MEI: calculateMEI(actor.mei_factors),
-      MLI: calculateMLIFromScores(actor.primitive_scores)
-    }
+    total: actors.length,
+    non_clearable,
+    clearable,
+    settled,
+    avg_mei,
+    avg_mli,
   }
 }
 
 /**
- * Get all actors with exposure (convenience export)
+ * Get actors grouped by sector
  */
-export function getAllActorsWithExposure(): ClearingActorWithExposure[] {
-  ensureInitialized()
-  return getAllActors()
+export function getActorsBySector(): Record<string, ActorOutput[]> {
+  const actors = computeAllActors()
+  const bySector: Record<string, ActorOutput[]> = {}
+
+  for (const actor of actors) {
+    if (!bySector[actor.sector]) {
+      bySector[actor.sector] = []
+    }
+    bySector[actor.sector].push(actor)
+  }
+
+  // Sort each sector by MEI descending
+  for (const sector of Object.keys(bySector)) {
+    bySector[sector].sort((a, b) => b.MEI - a.MEI)
+  }
+
+  return bySector
 }

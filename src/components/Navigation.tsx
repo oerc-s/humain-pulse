@@ -5,10 +5,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const navItems = [
-  { href: '/entities', label: 'Registry' },
-  { href: '/sectors', label: 'Sectors' },
-  { href: '/hp-std-001', label: 'HP-STD-001' },
-  { href: '/certification', label: 'Certification' },
+  { href: '/registry', label: 'Registry' },
+  { href: '/actors', label: 'Actors' },
+  { href: '/notices', label: 'Notices' },
 ]
 
 export function Navigation() {
@@ -17,7 +16,7 @@ export function Navigation() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 bg-[#050505] border-b border-white/10">
-      <div className="flex justify-between items-center max-w-[1800px] mx-auto px-6 py-4">
+      <div className="flex justify-between items-center max-w-[1400px] mx-auto px-6 py-4">
         <Link
           href="/"
           className="font-bold text-sm tracking-tight hover:opacity-70 transition-opacity uppercase select-none text-white"
@@ -41,14 +40,6 @@ export function Navigation() {
             </Link>
           ))}
         </div>
-
-        {/* Desktop email */}
-        <a
-          href="mailto:clearing@humain-pulse.com"
-          className="hidden md:block font-mono text-[10px] text-zinc-400 hover:text-white transition-colors"
-        >
-          clearing@humain-pulse.com
-        </a>
 
         {/* Mobile menu button */}
         <button
@@ -77,12 +68,6 @@ export function Navigation() {
                 {item.label}
               </Link>
             ))}
-            <a
-              href="mailto:clearing@humain-pulse.com"
-              className="font-mono text-xs text-zinc-500 mt-2"
-            >
-              clearing@humain-pulse.com
-            </a>
           </div>
         </div>
       )}
