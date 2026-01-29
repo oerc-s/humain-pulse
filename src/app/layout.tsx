@@ -17,12 +17,12 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'Humain Pulse — Machine-Native Risk Clearing (AGI / AI / Robotics)',
+    default: 'Humain Pulse — Machine-Native Clearing (AGI / AI / Robotics)',
     template: '%s | Humain Pulse'
   },
   description: 'Real-time UNSETTLED / PARTIAL / SETTLED / OBSERVED classification for autonomous systems. Exposure indices (MEI/MLI/Δ24h). HP-STD-001 attestation switches status.',
   keywords: [
-    'machine-native risk', 'AGI risk', 'AI liability', 'autonomous systems',
+    'machine-native clearing', 'AGI risk', 'AI liability', 'autonomous systems',
     'robotics liability', 'cloud concentration risk', 'reinsurance',
     'risk clearing', 'settlement primitives', 'exposure index',
   ],
@@ -35,13 +35,13 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: BASE_URL,
     siteName: 'Humain Pulse',
-    title: 'Humain Pulse — Machine-Native Risk Clearing (AGI / AI / Robotics)',
+    title: 'Humain Pulse — Machine-Native Clearing (AGI / AI / Robotics)',
     description: 'Real-time clearing classification for autonomous systems. Exposure indices (MEI/MLI/Δ24h). HP-STD-001 attestation switches status.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Humain Pulse — Machine-Native Risk Clearing' }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Humain Pulse — Machine-Native Clearing' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Humain Pulse — Machine-Native Risk Clearing',
+    title: 'Humain Pulse — Machine-Native Clearing',
     description: 'Real-time clearing classification for autonomous systems. Exposure indices (MEI/MLI/Δ24h).',
     images: ['/og-image.png'],
   },

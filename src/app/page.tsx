@@ -10,7 +10,7 @@ export default function HomePage() {
       <div className="max-w-[900px] mx-auto">
 
         <h1 className="text-2xl md:text-4xl font-medium tracking-tight text-white mb-4 uppercase">
-          Humain Pulse <span className="text-zinc-500">— Machine-Native Risk Clearing (AGI / AI / Robotics)</span>
+          Humain Pulse <span className="text-zinc-500">— Machine-Native Clearing (AGI / AI / Robotics)</span>
         </h1>
 
         <p className="text-white font-mono text-sm mb-12 max-w-xl">
