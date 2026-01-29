@@ -1,24 +1,19 @@
 /**
  * Humain Pulse — Machine-Native Clearing Operator
- * Type definitions (EXACT SPEC)
  */
 
 export type Sector = 'REINSURANCE' | 'AI_LABS' | 'CLOUD' | 'ROBOTICS'
 
-export type State = 'Non-Clearable' | 'Clearable' | 'Settled'
+export type State = 'UNSETTLED' | 'PARTIAL' | 'SETTLED' | 'OBSERVED'
+
+export type Band = 'LOW' | 'ELEVATED' | 'CRITICAL'
 
 export interface Primitives {
   MID: boolean
+  EI: boolean
   M2M_SE: boolean
   LCH: boolean
   CSD: boolean
-}
-
-export interface Proof {
-  title: string
-  url: string
-  source_type: string
-  date: string
 }
 
 export interface ActorInput {
@@ -27,14 +22,6 @@ export interface ActorInput {
   slug: string
   sector: Sector
   primitives: Primitives
-  proofs: Proof[]
-}
-
-export interface Subscores {
-  A: number // autonomy_level
-  S: number // systemic_concentration
-  L: number // loss_surface
-  P: number // primitive_gap
 }
 
 export interface ActorOutput {
@@ -45,14 +32,10 @@ export interface ActorOutput {
   state: State
   MEI: number
   MLI: number
-  delta_24h: number
-  subscores: Subscores
+  dMEI_24h: number
+  dMLI_24h: number
+  mei_band: Band
+  mli_band: Band
   primitives: Primitives
-  proofs: Proof[]
   last_updated_utc: string
-}
-
-export interface Registry {
-  actors: ActorOutput[]
-  generated_utc: string
 }
