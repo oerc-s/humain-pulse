@@ -30,8 +30,8 @@ export default function HomePage() {
           </div>
           <div className="flex gap-4 items-baseline">
             <span className="text-zinc-500 text-xs w-24">Indices</span>
-            <span className="text-white">MEI + MLI + Δ24h</span>
-            <span className="text-zinc-600 text-xs">Scale 0–1000</span>
+            <span className="text-white">Exposure + MEI + MLI + Δ24h</span>
+            <span className="text-zinc-600 text-xs">Scale 0–100</span>
           </div>
           <div className="flex gap-4 items-baseline">
             <span className="text-zinc-500 text-xs w-24">Cycle</span>
@@ -59,10 +59,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <Link href="/entities" className="btn-primary">Entities</Link>
-          <Link href="/sectors" className="btn-secondary">Sectors</Link>
-        </div>
+        <Link href="/entities" className="btn-primary">Registry</Link>
       </div>
     </div>
   )

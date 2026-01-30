@@ -6,8 +6,6 @@ export type Sector = 'REINSURANCE' | 'AI_LABS' | 'CLOUD' | 'ROBOTICS'
 
 export type State = 'UNSETTLED' | 'PARTIAL' | 'SETTLED' | 'OBSERVED'
 
-export type Band = 'LOW' | 'ELEVATED' | 'CRITICAL'
-
 export interface Primitives {
   MID: boolean
   EI: boolean
@@ -21,6 +19,8 @@ export interface ActorInput {
   actor_name: string
   slug: string
   sector: Sector
+  scaleProxy: number
+  proof_handle: string | null
   primitives: Primitives
 }
 
@@ -30,12 +30,11 @@ export interface ActorOutput {
   slug: string
   sector: Sector
   state: State
+  exposure: number
   MEI: number
   MLI: number
-  dMEI_24h: number
-  dMLI_24h: number
-  mei_band: Band
-  mli_band: Band
+  d24h: number
+  proof_handle: string | null
   primitives: Primitives
-  last_updated_utc: string
+  as_of: string
 }

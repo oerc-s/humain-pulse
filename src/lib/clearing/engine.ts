@@ -1,27 +1,25 @@
 import type { ActorInput, ActorOutput } from './types'
-import { computeMEI, computeMLI, deriveState, band, computeDelta } from './formulas'
+import { computeMEI, computeMLI, computeExposure, deriveState, computeD24h } from './formulas'
 import { ACTORS } from './data'
-
-let prevMEI: Record<string, number> = {}
-let prevMLI: Record<string, number> = {}
 
 export function computeActor(input: ActorInput): ActorOutput {
   const MEI = computeMEI(input.sector, input.primitives)
   const MLI = computeMLI(input.sector, input.primitives)
+  const exposure = computeExposure(MEI, MLI, input.scaleProxy)
+  const d24h = computeD24h(input.scaleProxy)
   return {
     actor_id: input.actor_id,
     actor_name: input.actor_name,
     slug: input.slug,
     sector: input.sector,
     state: deriveState(input.primitives),
+    exposure,
     MEI,
     MLI,
-    dMEI_24h: computeDelta(MEI, prevMEI[input.slug] ?? null),
-    dMLI_24h: computeDelta(MLI, prevMLI[input.slug] ?? null),
-    mei_band: band(MEI),
-    mli_band: band(MLI),
+    d24h,
+    proof_handle: input.proof_handle,
     primitives: input.primitives,
-    last_updated_utc: new Date().toISOString(),
+    as_of: new Date().toISOString(),
   }
 }
 
@@ -29,9 +27,9 @@ export function computeAllActors(): ActorOutput[] {
   return ACTORS.map(computeActor)
 }
 
-export function getLeagueTable(): ActorOutput[] {
+export function getRegistry(): ActorOutput[] {
   const actors = computeAllActors()
-  actors.sort((a, b) => b.MEI - a.MEI)
+  actors.sort((a, b) => b.exposure - a.exposure)
   return actors
 }
 

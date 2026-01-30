@@ -1,4 +1,4 @@
-export type { Sector, State, Band, Primitives, ActorInput, ActorOutput } from './types'
-export { computeMEI, computeMLI, deriveState, band, primitiveGap } from './formulas'
-export { computeActor, computeAllActors, getLeagueTable, getActorBySlug, getStats } from './engine'
+export type { Sector, State, Primitives, ActorInput, ActorOutput } from './types'
+export { computeMEI, computeMLI, computeExposure, deriveState, primitiveGap, computeD24h } from './formulas'
+export { computeActor, computeAllActors, getRegistry, getActorBySlug, getStats } from './engine'
 export { ACTORS } from './data'

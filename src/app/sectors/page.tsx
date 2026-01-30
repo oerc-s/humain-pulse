@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { computeAllActors } from '@/lib/clearing/engine'
 import type { Sector, State } from '@/lib/clearing/types'
 
-const STATE_STYLE: Record<State, string> = {
+const STATE_COLOR: Record<State, string> = {
   UNSETTLED: 'text-red-500',
   PARTIAL: 'text-yellow-500',
   SETTLED: 'text-emerald-500',
@@ -74,7 +74,9 @@ export default function SectorsPage() {
 
         <div className="space-y-10">
           {SECTORS.map((s) => {
-            const sectorActors = allActors.filter((a) => a.sector === s.id)
+            const sectorActors = allActors
+              .filter((a) => a.sector === s.id)
+              .sort((a, b) => b.exposure - a.exposure)
             return (
               <div key={s.id} className="border border-white/10 p-6">
                 <h2 className="text-white font-medium uppercase mb-4">{s.name}</h2>
@@ -113,11 +115,13 @@ export default function SectorsPage() {
                         <Link href={`/entities/${a.slug}`} className="text-white hover:text-emerald-400 transition-colors w-44 shrink-0 truncate">
                           {a.actor_name}
                         </Link>
-                        <span className={`text-[9px] uppercase w-20 shrink-0 ${STATE_STYLE[a.state]}`}>{a.state}</span>
+                        <span className={`text-[9px] uppercase w-20 shrink-0 ${STATE_COLOR[a.state]}`}>{a.state}</span>
+                        <span className="text-white text-xs">Exp {a.exposure}</span>
                         <span className="text-zinc-500 text-xs">MEI {a.MEI}</span>
-                        <span className="text-zinc-600 text-xs">{a.mei_band}</span>
                         <span className="text-zinc-500 text-xs">MLI {a.MLI}</span>
-                        <span className="text-zinc-600 text-xs">{a.mli_band}</span>
+                        <span className={`text-xs ${a.d24h > 0 ? 'text-red-400' : a.d24h < 0 ? 'text-emerald-400' : 'text-zinc-600'}`}>
+                          Δ{a.d24h > 0 ? '+' : ''}{a.d24h}
+                        </span>
                       </div>
                     ))}
                   </div>

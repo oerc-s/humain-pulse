@@ -1,9 +1,9 @@
 /**
  * Humain Pulse — Deterministic Scoring
- * Scale: 0–1000
+ * Scale: 0–100
  */
 
-import type { Sector, State, Band, Primitives } from './types'
+import type { Sector, State, Primitives } from './types'
 
 const AUTONOMY: Record<Sector, number> = {
   REINSURANCE: 0.40, AI_LABS: 1.00, CLOUD: 0.70, ROBOTICS: 1.00,
@@ -41,12 +41,17 @@ export function primitiveGap(p: Primitives): number {
 export function computeMEI(sector: Sector, p: Primitives): number {
   const w = MEI_W[sector]
   const raw = w.wA * AUTONOMY[sector] + w.wS * SYSTEMIC[sector] + w.wL * LOSS[sector] + w.wP * primitiveGap(p)
-  return clamp(Math.round(1000 * raw), 0, 1000)
+  return clamp(Math.round(100 * raw), 0, 100)
 }
 
 export function computeMLI(sector: Sector, p: Primitives): number {
   const raw = 0.55 * primitiveGap(p) + 0.35 * LOSS[sector] + 0.10 * AUTONOMY[sector]
-  return clamp(Math.round(1000 * raw), 0, 1000)
+  return clamp(Math.round(100 * raw), 0, 100)
+}
+
+export function computeExposure(mei: number, mli: number, scaleProxy: number): number {
+  const raw = 0.45 * mli + 0.35 * mei + 0.20 * scaleProxy
+  return clamp(Math.round(raw), 0, 100)
 }
 
 export function deriveState(p: Primitives): State {
@@ -57,13 +62,7 @@ export function deriveState(p: Primitives): State {
   return 'UNSETTLED'
 }
 
-export function band(v: number): Band {
-  if (v <= 300) return 'LOW'
-  if (v <= 600) return 'ELEVATED'
-  return 'CRITICAL'
-}
-
-export function computeDelta(current: number, prev: number | null): number {
-  if (prev === null) return 0
-  return clamp(Math.round(current - prev), -1000, 1000)
+export function computeD24h(scaleProxy: number): number {
+  // No prior snapshot exists — high-scale actors get +1, others get 0 (explicit)
+  return scaleProxy >= 80 ? 1 : 0
 }

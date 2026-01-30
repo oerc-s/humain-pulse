@@ -1,38 +1,26 @@
 import Link from 'next/link'
-import { getLeagueTable } from '@/lib/clearing/engine'
+import { getRegistry } from '@/lib/clearing/engine'
 import type { State } from '@/lib/clearing/types'
 
-const STATE_STYLE: Record<State, string> = {
-  UNSETTLED: 'text-red-500 border-red-900 bg-red-950/20',
-  PARTIAL: 'text-yellow-500 border-yellow-900 bg-yellow-950/20',
-  SETTLED: 'text-emerald-500 border-emerald-900 bg-emerald-950/20',
-  OBSERVED: 'text-blue-400 border-blue-900 bg-blue-950/20',
+const STATE_COLOR: Record<State, string> = {
+  UNSETTLED: 'text-red-500',
+  PARTIAL: 'text-yellow-500',
+  SETTLED: 'text-emerald-500',
+  OBSERVED: 'text-blue-400',
 }
 
-const STATE_LABEL: Record<State, string> = {
-  UNSETTLED: 'losses accumulating',
-  PARTIAL: 'cash mismatch recorded',
-  SETTLED: 'clearing active',
-  OBSERVED: 'loss vector active',
-}
-
-export default function EntitiesPage() {
-  const actors = getLeagueTable()
-  const today = new Date().toISOString().split('T')[0]
+export default function RegistryPage() {
+  const actors = getRegistry()
 
   return (
     <div className="pt-24 px-6 md:px-12">
-      <div className="max-w-[1600px] mx-auto">
+      <div className="max-w-[1400px] mx-auto">
 
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-xl md:text-2xl font-medium tracking-tight text-white uppercase">
-            Exposure League Table
-          </h1>
-          <span className="font-mono text-[10px] text-zinc-500">{today}</span>
-        </div>
-
+        <h1 className="text-xl md:text-2xl font-medium tracking-tight text-white uppercase mb-2">
+          Public Registry
+        </h1>
         <p className="font-mono text-[10px] text-zinc-500 mb-6">
-          MEI / MLI / Δ24h · Scale 0–1000 · LOW (0–300) · ELEVATED (301–600) · CRITICAL (601–1000)
+          Exposure ∈ [0..100] · Deterministic · Single source of truth
         </p>
 
         <div className="overflow-x-auto">
@@ -41,49 +29,33 @@ export default function EntitiesPage() {
               <tr className="border-b border-white/10 text-zinc-500 font-mono text-[10px] uppercase tracking-widest">
                 <th className="py-3 pr-4">Actor</th>
                 <th className="py-3 pr-4">Sector</th>
-                <th className="py-3 pr-4">Status</th>
+                <th className="py-3 pr-4">State</th>
+                <th className="py-3 pr-2 text-right">Exposure</th>
                 <th className="py-3 pr-2 text-right">MEI</th>
-                <th className="py-3 pr-4 text-right">Band</th>
                 <th className="py-3 pr-2 text-right">MLI</th>
-                <th className="py-3 pr-4 text-right">Band</th>
-                <th className="py-3 pr-2 text-right">ΔMEI</th>
-                <th className="py-3 pr-4 text-right">ΔMLI</th>
-                <th className="py-3 text-center">MID</th>
-                <th className="py-3 text-center">EI</th>
-                <th className="py-3 text-center">M2M-SE</th>
-                <th className="py-3 text-center">LCH</th>
-                <th className="py-3 text-center">CSD</th>
+                <th className="py-3 pr-2 text-right">Δ24h</th>
+                <th className="py-3 pr-4">Proof_Handle</th>
+                <th className="py-3 text-right">As_of</th>
               </tr>
             </thead>
             <tbody>
               {actors.map((a) => (
-                <tr key={a.slug} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                <tr key={a.slug} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
                   <td className="py-3 pr-4">
                     <Link href={`/entities/${a.slug}`} className="text-white hover:text-emerald-400 transition-colors text-sm">
                       {a.actor_name}
                     </Link>
                   </td>
                   <td className="py-3 pr-4 font-mono text-[10px] text-zinc-400">{a.sector.replace('_', ' ')}</td>
-                  <td className="py-3 pr-4">
-                    <span className={`inline-flex px-2 py-1 text-[9px] font-mono uppercase tracking-wider border ${STATE_STYLE[a.state]}`}>
-                      {a.state}
-                    </span>
-                  </td>
-                  <td className="py-3 pr-2 text-right font-mono text-sm text-white">{a.MEI}</td>
-                  <td className="py-3 pr-4 text-right font-mono text-[9px] text-zinc-500">{a.mei_band}</td>
+                  <td className={`py-3 pr-4 font-mono text-[10px] uppercase ${STATE_COLOR[a.state]}`}>{a.state}</td>
+                  <td className="py-3 pr-2 text-right font-mono text-sm text-white font-medium">{a.exposure}</td>
+                  <td className="py-3 pr-2 text-right font-mono text-sm text-zinc-400">{a.MEI}</td>
                   <td className="py-3 pr-2 text-right font-mono text-sm text-zinc-400">{a.MLI}</td>
-                  <td className="py-3 pr-4 text-right font-mono text-[9px] text-zinc-500">{a.mli_band}</td>
-                  <td className={`py-3 pr-2 text-right font-mono text-sm ${a.dMEI_24h > 0 ? 'text-red-400' : a.dMEI_24h < 0 ? 'text-emerald-400' : 'text-zinc-600'}`}>
-                    {a.dMEI_24h > 0 ? '+' : ''}{a.dMEI_24h}
+                  <td className={`py-3 pr-2 text-right font-mono text-sm ${a.d24h > 0 ? 'text-red-400' : a.d24h < 0 ? 'text-emerald-400' : 'text-zinc-600'}`}>
+                    {a.d24h > 0 ? '+' : ''}{a.d24h}
                   </td>
-                  <td className={`py-3 pr-4 text-right font-mono text-sm ${a.dMLI_24h > 0 ? 'text-red-400' : a.dMLI_24h < 0 ? 'text-emerald-400' : 'text-zinc-600'}`}>
-                    {a.dMLI_24h > 0 ? '+' : ''}{a.dMLI_24h}
-                  </td>
-                  <td className="py-3 text-center font-mono text-sm">{a.primitives.MID ? '✓' : '✗'}</td>
-                  <td className="py-3 text-center font-mono text-sm">{a.primitives.EI ? '✓' : '✗'}</td>
-                  <td className="py-3 text-center font-mono text-sm">{a.primitives.M2M_SE ? '✓' : '✗'}</td>
-                  <td className="py-3 text-center font-mono text-sm">{a.primitives.LCH ? '✓' : '✗'}</td>
-                  <td className="py-3 text-center font-mono text-sm">{a.primitives.CSD ? '✓' : '✗'}</td>
+                  <td className="py-3 pr-4 font-mono text-[10px] text-zinc-600">{a.proof_handle ?? '—'}</td>
+                  <td className="py-3 text-right font-mono text-[10px] text-zinc-600 whitespace-nowrap">{a.as_of.split('T')[0]}</td>
                 </tr>
               ))}
             </tbody>
