@@ -11,10 +11,15 @@ export default function HPStdPage() {
 
         <div className="font-mono text-sm space-y-4">
           <div className="flex gap-4"><span className="text-emerald-400 w-20 shrink-0">MID</span><span className="text-zinc-400">Machine Identity Declaration</span></div>
-          <div className="flex gap-4"><span className="text-emerald-400 w-20 shrink-0">EI</span><span className="text-zinc-400">Exposure Identifier</span></div>
           <div className="flex gap-4"><span className="text-emerald-400 w-20 shrink-0">M2M-SE</span><span className="text-zinc-400">Machine-to-Machine Settlement Endpoint</span></div>
           <div className="flex gap-4"><span className="text-emerald-400 w-20 shrink-0">LCH</span><span className="text-zinc-400">Lifecycle Hash</span></div>
           <div className="flex gap-4"><span className="text-emerald-400 w-20 shrink-0">CSD</span><span className="text-zinc-400">Conformance State Declaration</span></div>
+        </div>
+
+        <div className="mt-8 font-mono text-xs text-zinc-600 space-y-2">
+          <p>4 primitives required for Settled state.</p>
+          <p>prim_sum ≥ 2 + proof_strength ≥ 2 → Clearable.</p>
+          <p>Otherwise → Non-Clearable.</p>
         </div>
 
         <div className="mt-8">

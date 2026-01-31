@@ -4,14 +4,13 @@
 
 export type Sector = 'REINSURANCE' | 'AI_LABS' | 'CLOUD' | 'ROBOTICS'
 
-export type State = 'UNSETTLED' | 'PARTIAL' | 'SETTLED' | 'OBSERVED'
+export type State = 'Non-Clearable' | 'Clearable' | 'Settled'
 
 export interface Primitives {
-  MID: boolean
-  EI: boolean
-  M2M_SE: boolean
-  LCH: boolean
-  CSD: boolean
+  MID: 0 | 1
+  M2M_SE: 0 | 1
+  LCH: 0 | 1
+  CSD: 0 | 1
 }
 
 export interface ActorInput {
@@ -19,9 +18,10 @@ export interface ActorInput {
   actor_name: string
   slug: string
   sector: Sector
-  scaleProxy: number
-  proof_handle: string | null
   primitives: Primitives
+  proof_strength: 0 | 1 | 2 | 3
+  scale_proxy: 1 | 2 | 3
+  proof_handle: string
 }
 
 export interface ActorOutput {
@@ -30,11 +30,11 @@ export interface ActorOutput {
   slug: string
   sector: Sector
   state: State
-  exposure: number
   MEI: number
   MLI: number
+  exposure: number
   d24h: number
-  proof_handle: string | null
+  proof_handle: string
   primitives: Primitives
   as_of: string
 }

@@ -3,10 +3,9 @@ import { getRegistry } from '@/lib/clearing/engine'
 import type { State } from '@/lib/clearing/types'
 
 const STATE_COLOR: Record<State, string> = {
-  UNSETTLED: 'text-red-500',
-  PARTIAL: 'text-yellow-500',
-  SETTLED: 'text-emerald-500',
-  OBSERVED: 'text-blue-400',
+  'Non-Clearable': 'text-red-500',
+  'Clearable': 'text-yellow-500',
+  'Settled': 'text-emerald-500',
 }
 
 export default function RegistryPage() {
@@ -20,7 +19,7 @@ export default function RegistryPage() {
           Public Registry
         </h1>
         <p className="font-mono text-[10px] text-zinc-500 mb-6">
-          Exposure ∈ [0..100] · Deterministic · Single source of truth
+          Deterministic indices · Scale 0–100 · Single source of truth
         </p>
 
         <div className="overflow-x-auto">
@@ -30,9 +29,9 @@ export default function RegistryPage() {
                 <th className="py-3 pr-4">Actor</th>
                 <th className="py-3 pr-4">Sector</th>
                 <th className="py-3 pr-4">State</th>
-                <th className="py-3 pr-2 text-right">Exposure</th>
                 <th className="py-3 pr-2 text-right">MEI</th>
                 <th className="py-3 pr-2 text-right">MLI</th>
+                <th className="py-3 pr-2 text-right">Exposure</th>
                 <th className="py-3 pr-2 text-right">Δ24h</th>
                 <th className="py-3 pr-4">Proof_Handle</th>
                 <th className="py-3 text-right">As_of</th>
@@ -48,14 +47,14 @@ export default function RegistryPage() {
                   </td>
                   <td className="py-3 pr-4 font-mono text-[10px] text-zinc-400">{a.sector.replace('_', ' ')}</td>
                   <td className={`py-3 pr-4 font-mono text-[10px] uppercase ${STATE_COLOR[a.state]}`}>{a.state}</td>
-                  <td className="py-3 pr-2 text-right font-mono text-sm text-white font-medium">{a.exposure}</td>
                   <td className="py-3 pr-2 text-right font-mono text-sm text-zinc-400">{a.MEI}</td>
                   <td className="py-3 pr-2 text-right font-mono text-sm text-zinc-400">{a.MLI}</td>
-                  <td className={`py-3 pr-2 text-right font-mono text-sm ${a.d24h > 0 ? 'text-red-400' : a.d24h < 0 ? 'text-emerald-400' : 'text-zinc-600'}`}>
-                    {a.d24h > 0 ? '+' : ''}{a.d24h}
+                  <td className="py-3 pr-2 text-right font-mono text-sm text-white font-medium">{a.exposure}</td>
+                  <td className={`py-3 pr-2 text-right font-mono text-sm ${a.d24h > 0 ? 'text-red-400' : 'text-zinc-600'}`}>
+                    +{a.d24h}
                   </td>
-                  <td className="py-3 pr-4 font-mono text-[10px] text-zinc-600">{a.proof_handle ?? '—'}</td>
-                  <td className="py-3 text-right font-mono text-[10px] text-zinc-600 whitespace-nowrap">{a.as_of.split('T')[0]}</td>
+                  <td className="py-3 pr-4 font-mono text-[10px] text-zinc-600">{a.proof_handle}</td>
+                  <td className="py-3 text-right font-mono text-[10px] text-zinc-600 whitespace-nowrap">{a.as_of}</td>
                 </tr>
               ))}
             </tbody>

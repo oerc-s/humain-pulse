@@ -3,16 +3,15 @@ import { computeAllActors } from '@/lib/clearing/engine'
 import type { State } from '@/lib/clearing/types'
 
 const STATE_COLOR: Record<State, string> = {
-  UNSETTLED: 'text-red-500',
-  PARTIAL: 'text-yellow-500',
-  SETTLED: 'text-emerald-500',
-  OBSERVED: 'text-blue-400',
+  'Non-Clearable': 'text-red-500',
+  'Clearable': 'text-yellow-500',
+  'Settled': 'text-emerald-500',
 }
 
 export default function NoticesPage() {
   const actors = computeAllActors()
   const today = new Date().toISOString().split('T')[0]
-  const nonSettled = actors.filter((a) => a.state !== 'SETTLED')
+  const nonSettled = actors.filter((a) => a.state !== 'Settled')
 
   return (
     <div className="pt-24 px-6 md:px-12">
@@ -34,14 +33,14 @@ export default function NoticesPage() {
                   {a.actor_name}
                 </Link>
                 <span className={`text-[10px] uppercase ${STATE_COLOR[a.state]}`}>{a.state}</span>
-                <span className="text-zinc-600 text-xs">Exp {a.exposure} · MEI {a.MEI} · MLI {a.MLI}</span>
+                <span className="text-zinc-600 text-xs">Exp {a.exposure} · MEI {a.MEI} · MLI {a.MLI} · Δ+{a.d24h}</span>
               </div>
             ))}
           </div>
         </div>
 
         <p className="font-mono text-[10px] text-zinc-600">
-          {actors.length} entities tracked · {nonSettled.length} non-settled · HP-STD-001 v1.10
+          {actors.length} entities tracked · {nonSettled.length} non-settled
         </p>
 
         <div className="mt-8">
